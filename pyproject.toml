@@ -1,0 +1,61 @@
+[project]
+name = "ssm-ps-template"
+version = "0.1.0"
+description = "CLI for rendering configuration templates with SSM Parameter Store as a data source"
+authors = [
+    {name = "Gavin M. Roy", email="gavinmroy@gmail.com"}
+]
+classifiers = [
+    "Topic :: Software Development"
+]
+dependencies = [
+    "boto3>=1.26.127,<2",
+    "jinja2>=3,<4",
+    "pyyaml>=6,<7",
+    "toml>=0.10,<1"
+]
+keywords = ["aws", "ssm", "parameter store", "templating"]
+license = {file = "LICENSE.txt"}
+readme = "README.md"
+requires-python = ">=3.9"
+
+[project.scripts]
+ssm-ps-template = "ssm_ps_template.__main__:main"
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "flake8",
+    "flake8-comprehensions",
+    "flake8-deprecated",
+    "flake8-import-order",
+    "flake8-print",
+    "flake8-pyproject",
+    "flake8-quotes",
+    "flake8-rst-docstrings",
+    "flake8-tuple",
+    "yapf"
+]
+
+[tool.coverage.run]
+branch = true
+command_line = "-m unittest discover tests --verbose"
+data_file = "build/.coverage"
+
+[tool.coverage.report]
+show_missing = true
+include = ["ssm_ps_template/*"]
+omit = ["tests/*.py"]
+
+[tool.coverage.html]
+directory = "build/coverage"
+
+[tool.coverage.xml]
+output = "build/coverage.xml"
+
+[tool.flake8]
+application-import-names = "ssm_ps_template"
+count = true
+exclude = ["bak", "build", "docs", "env"]
+import-order-style = "google"
+ignore = ["RST306"]

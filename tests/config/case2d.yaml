@@ -1,0 +1,3 @@
+templates:
+  - source: tests/templates/case99.tmpl
+    destination: build/case99.out
