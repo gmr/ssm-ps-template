@@ -6,7 +6,9 @@ authors = [
     {name = "Gavin M. Roy", email="gavinmroy@gmail.com"}
 ]
 classifiers = [
-    "Topic :: Software Development"
+    "Topic :: Software Development",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3"
 ]
 dependencies = [
     "boto3>=1.26.127,<2",
@@ -22,8 +24,13 @@ requires-python = ">=3.9"
 [project.scripts]
 ssm-ps-template = "ssm_ps_template.__main__:main"
 
+[project.urls]
+"Homepage" = "https://github.com/gmr/ssm-ps-template"
+"Bug Tracker" = "https://github.com/gmr/ssm-ps-template/issues"
+
 [project.optional-dependencies]
 dev = [
+    "build",
     "coverage",
     "flake8",
     "flake8-comprehensions",
