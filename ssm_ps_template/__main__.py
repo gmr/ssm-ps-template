@@ -1,7 +1,7 @@
 import argparse
+from importlib import metadata
 import logging
 import time
-from importlib import metadata
 
 from ssm_ps_template import config, render, ssm
 

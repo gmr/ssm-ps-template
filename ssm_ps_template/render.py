@@ -33,8 +33,8 @@ class Renderer:
         """
         environment = sandbox.ImmutableSandboxedEnvironment()
         body = environment.preprocess(self._source)
-        tokens = [t for t in environment.lex(body)]
-        mode, variable, variables = DiscoveryMode.SIMPLE, [], set({})
+        tokens = list(environment.lex(body))
+        mode, variable = DiscoveryMode.SIMPLE, []
         for offset, token in enumerate(tokens):
             if mode == DiscoveryMode.SIMPLE \
                     and token[1] == 'operator' \

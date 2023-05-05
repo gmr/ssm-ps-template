@@ -10,12 +10,11 @@ class DiscoverVariablesTestCase(unittest.TestCase):
         renderer = render.Renderer(
             pathlib.Path('tests/templates/case1a.tmpl'))
         variables = renderer.discover_variables()
-        self.assertListEqual(sorted(list(variables)),
+        self.assertListEqual(sorted(variables),
                              ['foo/bar/baz', 'ssm_variable'])
 
 
 class RenderingTestCase(unittest.TestCase):
-
 
     def test_case1a(self):
         renderer = render.Renderer(
@@ -27,7 +26,6 @@ class RenderingTestCase(unittest.TestCase):
         with open('tests/expectations/case1a.out', 'r') as handle:
             expectation = handle.read()
         self.assertEqual(output.strip(), expectation.strip())
-
 
     def test_case1b(self):
         renderer = render.Renderer(
