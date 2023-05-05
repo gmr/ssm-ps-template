@@ -22,9 +22,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
 
-      - name: Set the timezone
-        run: setup-timezone -z America/New_York
-
       - name: Install testing dependencies
         run: pip3 install -e '.[dev]'
 
