@@ -1,3 +1,0 @@
-[[templates]]
-source = "tests/templates/case1b.tmpl"
-destination = "build/case1b.out"
