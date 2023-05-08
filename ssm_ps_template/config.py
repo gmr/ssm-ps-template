@@ -12,6 +12,7 @@ import yaml
 class Template:
     source: pathlib.Path
     destination: pathlib.Path
+    prefix: typing.Optional[str]
 
 
 @dataclasses.dataclass
@@ -42,7 +43,8 @@ def _entry_to_template(**kwargs) -> Template:
             f'Specified template {source} does not exist')
     return Template(
         source=source,
-        destination=pathlib.Path(kwargs['destination']))
+        destination=pathlib.Path(kwargs['destination']),
+        prefix=kwargs.get('prefix', None))
 
 
 def configuration_file(value: str) -> Configuration:

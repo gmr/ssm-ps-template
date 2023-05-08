@@ -31,10 +31,27 @@ The configuration file provides the ability to specify multiple templates, overr
 
 The `templates` directive in the configuration is an array of objects, defined by a `source` and `destination`.
 
-| Directive     | Description                                            |
-|---------------|--------------------------------------------------------|
-| `source`      | The source file of the template                        |
-| `destination` | The destination path to write the rendered template to |
+| Directive     | Description                                                                          |
+|---------------|--------------------------------------------------------------------------------------|
+| `source`      | The source file of the template                                                      |
+| `destination` | The destination path to write the rendered template to                               |
+| `prefix`      | The prefix to prepend variables with if they do not start with a forward-slash (`/`) |
+
+### Extended Templating Functionality
+
+In addition to the base functionality exposed by Jinja2, the following Python functions have been added:
+
+| Function   | Definition                                                                                                                                          |
+|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `urlparse` | The [`urllib.parse.urlparse`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlparse) function from the Python standard library. |
+| `parse_qs` | The [`urllib.parse.parse_qs`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.parse_qs) function from the Python standard library. |
+| `unquote`  | The [`urllib.parse.unquote`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote) function from the Python standard library.   |
+
+The following variables are exposed:
+
+| Variable  | Definition                                                                                                              |
+|-----------|-------------------------------------------------------------------------------------------------------------------------|
+| `environ` | The [`os.environ`](https://docs.python.org/3/library/os.html#os.environ) dictionary for accessing environment variables |
 
 ### Configuration File Format
 
@@ -46,8 +63,10 @@ The application supports JSON, TOML, or YAML for configuration. The following ex
 templates:
   - source: /etc/ssm-templates/nginx-example
     destination: /etc/nginx/sites-available/example
+    prefix: /namespaced/application/nginx/
   - source: /etc/ssm-templates/postgres-example
     destination: /etc/postgresql/14/main/postgresql.conf
+    prefix: /namespaced/application/postgres/
 profile: default
 region: us-east-1
 verbose: false
