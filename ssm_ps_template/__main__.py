@@ -23,10 +23,10 @@ def parse_cli_arguments() -> argparse.Namespace:
 
 
 def render_templates(args: argparse.Namespace) -> typing.NoReturn:
-    parameter_store = ssm.ParameterStore(profile=args.aws_profile
-                                         or args.config[0].profile,
-                                         region=args.aws_region
-                                         or args.config[0].region)
+    parameter_store = ssm.ParameterStore(
+        profile=args.aws_profile or args.config[0].profile,
+        region=args.aws_region or args.config[0].region)
+
     start_time = time.time()
     for template in args.config[0].templates:
         variable_discovery = discover.Variables(template.source)
