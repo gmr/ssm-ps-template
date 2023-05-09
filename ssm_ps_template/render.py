@@ -13,9 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Renderer:
 
-    def __init__(self,
-                 source: pathlib.Path,
-                 variables: typing.List[str]):
+    def __init__(self, source: pathlib.Path, variables: typing.List[str]):
         with source.open('r') as handle:
             self._source = handle.read()
         self._buffer = io.StringIO()

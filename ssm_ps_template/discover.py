@@ -31,6 +31,7 @@ KEYWORDS = {
 
 class Variables:
     """Reads the template and parses out the variables to fetch"""
+
     def __init__(self, source: pathlib.Path):
         env = sandbox.ImmutableSandboxedEnvironment()
         with source.open('r') as handle:
@@ -83,8 +84,8 @@ class Variables:
                         if variable.startswith(f'{word}.'):
                             remove.add(variable)
                 variables |= discovered - remove
-                LOGGER.debug('After recursing, values %r - %r - %r',
-                             variables, ignore, remove)
+                LOGGER.debug('After recursing, values %r - %r - %r', variables,
+                             ignore, remove)
                 state = State.OFF
             elif state == State.BLOCK_PENDING and value == 'endif':
                 state = State.OFF
@@ -149,8 +150,8 @@ class Variables:
     def _should_add_variable(value: str) -> bool:
         return value and value not in KEYWORDS
 
-    def tokens(self) -> typing.Generator[
-            typing.Tuple[int, str, str], None, None]:
+    def tokens(
+            self) -> typing.Generator[typing.Tuple[int, str, str], None, None]:
         while self._offset < len(self._tokens):
             yield self._tokens[self._offset]
             self._offset += 1

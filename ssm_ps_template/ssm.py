@@ -16,12 +16,13 @@ class ParameterStore:
         self._client = self._session.client('ssm')
         self._ssm = boto3.client('ssm')
 
-    def fetch_variables(self,
-                        variables: list,
+    def fetch_variables(self, variables: list,
                         prefix: typing.Optional[str]) -> typing.Dict[str, str]:
         # Build the variables
-        names = ['/'.join([prefix.rstrip('/'), v])
-                 if prefix and not v.startswith('/') else v for v in variables]
+        names = [
+            '/'.join([prefix.rstrip('/'), v])
+            if prefix and not v.startswith('/') else v for v in variables
+        ]
 
         paths = [name for name in names if name.endswith('/')]
         names = [name for name in names if not name.endswith('/')]
@@ -30,26 +31,23 @@ class ParameterStore:
 
         values = {}
         while names:
-            response = self._client.get_parameters(
-                Names=names[:10],
-                WithDecryption=True)
+            response = self._client.get_parameters(Names=names[:10],
+                                                   WithDecryption=True)
 
             for param in response['Parameters']:
-                values = self.add_parameter(
-                    param, prefix, variables, values)
+                values = self.add_parameter(param, prefix, variables, values)
             names = names[10:]
 
         path_values = flatdict.FlatDict(delimiter='/')
         for path in paths:
             paginator = self._client.get_paginator('get_parameters_by_path')
-            for page in paginator.paginate(
-                    Path=path,
-                    Recursive=True,
-                    WithDecryption=True):
+            for page in paginator.paginate(Path=path,
+                                           Recursive=True,
+                                           WithDecryption=True):
                 for param in page['Parameters']:
                     LOGGER.debug('Param %r', param)
-                    path_values = self.add_parameter(
-                        param, prefix, variables, path_values)
+                    path_values = self.add_parameter(param, prefix, variables,
+                                                     path_values)
         for key, value in path_values.as_dict().items():
             values[f'{key}/'] = value
 
@@ -69,8 +67,9 @@ class ParameterStore:
         if param['Name'].startswith(prefix) and param['Name'] not in variables:
             param['Name'] = param['Name'][len(prefix):]
         if param['Type'] == 'StringList':
-            values[param['Name']] = [p for p in param['Value'].split(',')
-                                     if p.strip()]
+            values[param['Name']] = [
+                p for p in param['Value'].split(',') if p.strip()
+            ]
             LOGGER.debug('%s = %r', param['Name'], values[param['Name']])
         else:
             values[param['Name']] = param['Value'].rstrip()

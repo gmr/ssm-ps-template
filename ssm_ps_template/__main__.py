@@ -23,17 +23,18 @@ def parse_cli_arguments() -> argparse.Namespace:
 
 
 def render_templates(args: argparse.Namespace) -> typing.NoReturn:
-    parameter_store = ssm.ParameterStore(
-        profile=args.aws_profile or args.config[0].profile,
-        region=args.aws_region or args.config[0].region)
+    parameter_store = ssm.ParameterStore(profile=args.aws_profile
+                                         or args.config[0].profile,
+                                         region=args.aws_region
+                                         or args.config[0].region)
     start_time = time.time()
     for template in args.config[0].templates:
         variable_discovery = discover.Variables(template.source)
         variables = sorted(variable_discovery.discover())
 
         try:
-            values = parameter_store.fetch_variables(
-                variables, template.prefix)
+            values = parameter_store.fetch_variables(variables,
+                                                     template.prefix)
         except (exceptions.ClientError, exceptions.UnauthorizedSSOTokenError):
             sys.exit(1)
 
@@ -41,8 +42,8 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
         with template.destination.open('w') as handle:
             handle.write(renderer.render(values))
 
-        LOGGER.info('Rendered %s in %0.2f seconds',
-                    template.destination, time.time() - start_time)
+        LOGGER.info('Rendered %s in %0.2f seconds', template.destination,
+                    time.time() - start_time)
 
 
 def main():
