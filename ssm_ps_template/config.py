@@ -26,9 +26,9 @@ class Configuration:
 def _load_configuration(value: dict) -> Configuration:
     try:
         return Configuration(
-            templates=[_entry_to_template(
-                           prefix=value.get('prefix'), **template)
-                       for template in value['templates']],
+            templates=[
+                _entry_to_template(prefix=value.get('prefix'), **template)
+                for template in value['templates']],
             profile=value.get('profile'),
             region=value.get('region'),
             verbose=value.get('verbose', False))
