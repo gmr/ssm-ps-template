@@ -11,4 +11,4 @@ class DiscoverVariablesTestCase(unittest.TestCase):
             pathlib.Path('tests/templates/case1a.tmpl'))
         values = variables.discover()
         self.assertListEqual(sorted(values),
-                             ['foo/bar/baz', 'ssm_variable'])
+                             ['complex/', 'foo/bar/baz', 'ssm_variable'])

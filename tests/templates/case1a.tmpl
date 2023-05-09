@@ -1,1 +1,3 @@
-This is a test {{ ssm_variable }} and another {{ foo/bar/baz }}
+# This is a test {{ ssm_variable }} and another {{ foo/bar/baz }}
+config: {% set values = complex/ %}
+{{ values | toyaml | indent(2, first=True) }}
