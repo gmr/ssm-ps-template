@@ -1,25 +1,19 @@
 import pathlib
 import unittest
 
-from ssm_ps_template import render
+from ssm_ps_template import discover, render
 
-
-class DiscoverVariablesTestCase(unittest.TestCase):
-
-    def test_case1a(self):
-        renderer = render.Renderer(
-            pathlib.Path('tests/templates/case1a.tmpl'))
-        variables = renderer.discover_variables()
-        self.assertListEqual(sorted(variables),
-                             ['foo/bar/baz', 'ssm_variable'])
 
 
 class RenderingTestCase(unittest.TestCase):
 
     def test_case1a(self):
-        renderer = render.Renderer(
+        variables = discover.Variables(
             pathlib.Path('tests/templates/case1a.tmpl'))
-        renderer.discover_variables()
+        renderer = render.Renderer(
+            pathlib.Path('tests/templates/case1a.tmpl'),
+            list(variables.discover()))
+
         output = renderer.render({
             'ssm_variable': 'Variable',
             'foo/bar/baz': 'Corgie!'})
@@ -28,9 +22,11 @@ class RenderingTestCase(unittest.TestCase):
         self.assertEqual(output.strip(), expectation.strip())
 
     def test_case1b(self):
-        renderer = render.Renderer(
+        variables = discover.Variables(
             pathlib.Path('tests/templates/case1b.tmpl'))
-        renderer.discover_variables()
+        renderer = render.Renderer(
+            pathlib.Path('tests/templates/case1b.tmpl'),
+            list(variables.discover()))
         output = renderer.render({
             '/foo/bar/baz': 'postgresql://localhost:5432/postgres',
             '/qux/corgie': 'redis://localhost:6379/0'})

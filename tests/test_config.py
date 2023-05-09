@@ -12,10 +12,12 @@ class TestCase1(unittest.TestCase):
             templates=[
                 config.Template(
                     source=pathlib.Path('tests/templates/case1a.tmpl'),
-                    destination=pathlib.Path('build/case1a.out')),
+                    destination=pathlib.Path('build/case1a.out'),
+                    prefix=None),
                 config.Template(
                     source=pathlib.Path('tests/templates/case1b.tmpl'),
-                    destination=pathlib.Path('build/case1b.out')),
+                    destination=pathlib.Path('build/case1b.out'),
+                    prefix=None),
             ],
             profile=None,
             region=None,
