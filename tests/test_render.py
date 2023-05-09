@@ -1,6 +1,8 @@
 import pathlib
 import unittest
 
+import yaml
+
 from ssm_ps_template import discover, render
 
 
@@ -16,10 +18,16 @@ class RenderingTestCase(unittest.TestCase):
 
         output = renderer.render({
             'ssm_variable': 'Variable',
-            'foo/bar/baz': 'Corgie!'})
+            'foo/bar/baz': 'Corgie!',
+            'complex/': {'foo': 'bar', 'baz': 'corgie'}})
         with open('tests/expectations/case1a.out', 'r') as handle:
             expectation = handle.read()
-        self.assertEqual(output.strip(), expectation.strip())
+
+        value = yaml.safe_load(output)
+        expected = yaml.safe_load(expectation)
+        self.assertDictEqual(value, expected)
+        self.assertEqual(output.split('\n')[0].strip(),
+                         expectation.split('\n')[0].strip())
 
     def test_case1b(self):
         variables = discover.Variables(
