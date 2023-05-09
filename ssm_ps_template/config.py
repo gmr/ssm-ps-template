@@ -25,24 +25,26 @@ class Configuration:
 
 def _load_configuration(value: dict) -> Configuration:
     try:
-        return Configuration(templates=[_entry_to_template(**template)
-                                        for template in value['templates']],
-                             profile=value.get('profile'),
-                             region=value.get('region'),
-                             verbose=value.get('verbose', False))
+        return Configuration(
+            templates=[_entry_to_template(
+                           prefix=value.get('prefix'), **template)
+                       for template in value['templates']],
+            profile=value.get('profile'),
+            region=value.get('region'),
+            verbose=value.get('verbose', False))
     except KeyError as error:
         raise argparse.ArgumentTypeError(
             f'Failed to load configuration due to invalid key: {error}')
 
 
-def _entry_to_template(**kwargs) -> Template:
+def _entry_to_template(prefix: typing.Optional[str], **kwargs) -> Template:
     source = pathlib.Path(kwargs['source'])
     if not source.exists():
         raise argparse.ArgumentTypeError(
             f'Specified template {source} does not exist')
     return Template(source=source,
                     destination=pathlib.Path(kwargs['destination']),
-                    prefix=kwargs.get('prefix', None))
+                    prefix=kwargs.get('prefix', prefix))
 
 
 def configuration_file(value: str) -> Configuration:
