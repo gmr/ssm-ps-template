@@ -41,8 +41,7 @@ dev = [
     "flake8-pyproject",
     "flake8-quotes",
     "flake8-rst-docstrings",
-    "flake8-tuple",
-    "yapf"
+    "flake8-tuple"
 ]
 
 [tool.coverage.run]
