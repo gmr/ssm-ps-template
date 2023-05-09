@@ -6,7 +6,6 @@ import yaml
 from ssm_ps_template import discover, render
 
 
-
 class RenderingTestCase(unittest.TestCase):
 
     def test_case1a(self):
