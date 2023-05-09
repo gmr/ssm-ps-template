@@ -24,7 +24,8 @@ VARIABLE_BEGIN = 'variable_begin'
 VARIABLE_END = 'variable_end'
 
 KEYWORDS = {
-    'and', 'in', 'or', 'if', 'else', 'not', 'set', 'loop.last', 'none', 'int'
+    'and', 'in', 'or', 'if', 'else', 'not', 'set', 'loop.last', 'none', 'int',
+    'True', 'False', 'toyaml'
 }
 
 
