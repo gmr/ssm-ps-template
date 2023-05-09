@@ -1,8 +1,11 @@
 import argparse
 from importlib import metadata
 import logging
+import sys
 import time
 import typing
+
+from botocore import exceptions
 
 from ssm_ps_template import config, discover, render, ssm
 
@@ -28,7 +31,11 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
         variable_discovery = discover.Variables(template.source)
         variables = sorted(variable_discovery.discover())
 
-        values = parameter_store.fetch_variables(variables, template.prefix)
+        try:
+            values = parameter_store.fetch_variables(
+                variables, template.prefix)
+        except (exceptions.ClientError, exceptions.UnauthorizedSSOTokenError):
+            sys.exit(1)
 
         renderer = render.Renderer(source=template.source, variables=variables)
         with template.destination.open('w') as handle:
