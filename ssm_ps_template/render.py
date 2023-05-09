@@ -6,6 +6,7 @@ import typing
 from urllib import parse
 
 from jinja2 import sandbox
+import yaml
 
 LOGGER = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ class Renderer:
     def render(self, values: typing.Dict) -> str:
         """Render the template to the internal buffer"""
         environment = sandbox.ImmutableSandboxedEnvironment()
+        environment.filters['toyaml'] = lambda v: yaml.safe_dump(v)
         environment.globals['parse_qs'] = parse.parse_qs
         environment.globals['unquote'] = parse.unquote
         environment.globals['urlparse'] = parse.urlparse

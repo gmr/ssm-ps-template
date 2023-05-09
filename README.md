@@ -47,6 +47,12 @@ In addition to the base functionality exposed by Jinja2, the following Python fu
 | `parse_qs` | The [`urllib.parse.parse_qs`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.parse_qs) function from the Python standard library. |
 | `unquote`  | The [`urllib.parse.unquote`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote) function from the Python standard library.   |
 
+The following filters are added:
+
+| Filter   | Description                         |
+|----------|-------------------------------------|
+| `toyaml` | Converts a dictionary value to YAML |
+
 The following variables are exposed:
 
 | Variable  | Definition                                                                                                              |
@@ -70,6 +76,29 @@ templates:
 profile: default
 region: us-east-1
 verbose: false
+```
+
+## Path Based Dictionaries
+
+In more complex templates it's possible to need a dictionary of values from SSM instead of straight key/value usage.
+
+This is achieved by setting a variable to a key with a trailing slash (`/`).
+
+The following pattern will retrieve all keys under a path and return them as a nested dictionary with a `/` delimiter,
+and then iterate over the key/value pairs:
+
+```
+{% set values = settings/ %}
+{% for key, value in settings.items() %}
+  {{ key }}: {{ value }}
+{% endfor %}
+```
+
+Or to convert them to YAML:
+
+```
+settings: {% set values = settings/ %}
+{{ values | toyaml | indent(2, first=True) }}
 ```
 
 ## Command Line Usage
