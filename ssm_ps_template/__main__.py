@@ -1,9 +1,9 @@
 import argparse
-from importlib import metadata
 import logging
 import sys
 import time
 import typing
+from importlib import metadata
 
 from botocore import exceptions
 

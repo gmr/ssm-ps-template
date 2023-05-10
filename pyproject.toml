@@ -71,5 +71,5 @@ output = "build/coverage.xml"
 application-import-names = "ssm_ps_template"
 count = true
 exclude = ["bak", "build", "docs", "env"]
-import-order-style = "google"
+import-order-style = "pycharm"
 ignore = ["RST306"]

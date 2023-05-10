@@ -5,8 +5,8 @@ import pathlib
 import typing
 from urllib import parse
 
-from jinja2 import sandbox
 import yaml
+from jinja2 import sandbox
 
 LOGGER = logging.getLogger(__name__)
 
