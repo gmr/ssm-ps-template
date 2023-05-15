@@ -37,8 +37,8 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
         variables = sorted(variable_discovery.discover())
 
         try:
-            values = parameter_store.fetch_variables(variables,
-                                                     template.prefix)
+            values = parameter_store.fetch_variables(
+                variables, args.prefix or template.prefix)
         except (exceptions.ClientError,
                 exceptions.UnauthorizedSSOTokenError) as err:
             LOGGER.error('Error fetching parameters: %s', err)

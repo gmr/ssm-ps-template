@@ -30,7 +30,7 @@ def _load_configuration(value: dict) -> Configuration:
             templates.append(_entry_to_template(
                 source=template['source'],
                 destination=template['destination'],
-                prefix=value.get('prefix', template.get('prefix'))))
+                prefix=template.get('prefix', '')))
     except KeyError as error:
         raise argparse.ArgumentTypeError(
             f'Failed to load configuration due to invalid key: {error}')
