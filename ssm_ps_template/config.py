@@ -35,10 +35,10 @@ def _load_configuration(value: dict) -> Configuration:
         raise argparse.ArgumentTypeError(
             f'Failed to load configuration due to invalid key: {error}')
     return Configuration(
-            templates=templates,
-            profile=value.get('profile'),
-            region=value.get('region'),
-            verbose=value.get('verbose', False))
+        templates=templates,
+        profile=value.get('profile'),
+        region=value.get('region'),
+        verbose=value.get('verbose', False))
 
 
 def _entry_to_template(**kwargs) -> Template:
