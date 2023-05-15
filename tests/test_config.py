@@ -13,7 +13,7 @@ class TestCase1(unittest.TestCase):
                 config.Template(
                     source=pathlib.Path('tests/templates/case1a.tmpl'),
                     destination=pathlib.Path('build/case1a.out'),
-                    prefix=None),
+                    prefix="/foo/bar/baz"),
                 config.Template(
                     source=pathlib.Path('tests/templates/case1b.tmpl'),
                     destination=pathlib.Path('build/case1b.out'),
