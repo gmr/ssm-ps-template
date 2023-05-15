@@ -104,7 +104,8 @@ settings: {% set values = settings/ %}
 ## Command Line Usage
 
 ```
-usage: ssm-ps-template [-h] [--aws-profile AWS_PROFILE] [--aws-region AWS_REGION] [--prefix] [--verbose] config
+usage: ssm-ps-template [-h] [--aws-profile AWS_PROFILE] [--aws-region AWS_REGION] [--prefix PREFIX] [--verbose] config
+
 Templating for SSM Parameter Store
 
 positional arguments:
@@ -116,6 +117,7 @@ optional arguments:
                         AWS Profile
   --aws-region AWS_REGION
                         AWS Region
-  --prefix              Default SSM Key Prefix
+  --prefix PREFIX       Default SSM Key Prefix
   --verbose
 ```
+Note that the default SSM prefix can also be set with the `PARAMS_PREFIX` environment variable.

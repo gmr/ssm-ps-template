@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import sys
 import time
 import typing
@@ -17,8 +18,9 @@ def parse_cli_arguments() -> argparse.Namespace:
         description='Templating for SSM Parameter Store')
     parser.add_argument('--aws-profile', action='store', help='AWS Profile')
     parser.add_argument('--aws-region', action='store', help='AWS Region')
-    parser.add_argument('--prefix', action='store_true',
-                        help='Default SSM Key Prefix')
+    parser.add_argument('--prefix', action='store',
+                        help='Default SSM Key Prefix',
+                        default=os.environ.get('PARAMS_PREFIX'))
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('config', type=config.configuration_file, nargs=1)
     return parser.parse_args()
