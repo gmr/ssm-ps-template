@@ -1,6 +1,6 @@
 [project]
 name = "ssm-ps-template"
-version = "1.0.0b6"
+version = "1.0.0"
 description = "CLI for rendering configuration templates with SSM Parameter Store as a data source"
 authors = [
     {name = "Gavin M. Roy", email="gavinmroy@gmail.com"}

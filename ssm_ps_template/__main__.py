@@ -31,6 +31,10 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
         profile=args.aws_profile or args.config[0].profile,
         region=args.aws_region or args.config[0].region)
 
+    prefix = args.prefix
+    if not prefix.endswith('/'):
+        prefix = f'{args.prefix}/'
+
     start_time = time.time()
     for template in args.config[0].templates:
         variable_discovery = discover.Variables(template.source)
@@ -38,7 +42,7 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
 
         try:
             values = parameter_store.fetch_variables(
-                variables, args.prefix or template.prefix)
+                variables, prefix or template.prefix)
         except (exceptions.ClientError,
                 exceptions.UnauthorizedSSOTokenError) as err:
             LOGGER.error('Error fetching parameters: %s', err)
