@@ -37,10 +37,10 @@ jobs:
       - name: Run tests
         run: coverage run && coverage report && coverage xml
         env:
-          AWS_REGION=development
-          AWS_ACCESS_KEY_ID=local
-          AWS_SECRET_ACCESS_KEY=development
-          ENDPOINT_URL=http://localhost:4566
+          AWS_REGION: development
+          AWS_ACCESS_KEY_ID: local
+          AWS_SECRET_ACCESS_KEY: development
+          ENDPOINT_URL: http://localhost:4566
       - name: Upload Coverage
         uses: codecov/codecov-action@v1.0.2
         if: github.event_name == 'push' && github.repository == 'gmr/ssm-ps-template'
