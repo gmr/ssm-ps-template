@@ -37,7 +37,7 @@ jobs:
       - name: Run tests
         run: coverage run && coverage report && coverage xml
         env:
-          AWS_REGION: development
+          AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: local
           AWS_SECRET_ACCESS_KEY: development
           ENDPOINT_URL: http://localhost:4566
