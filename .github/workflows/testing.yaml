@@ -18,6 +18,12 @@ jobs:
           - "3.11"
     container:
       image: python:${{ matrix.python }}-alpine
+    services:
+      localstack:
+        image: localstack/localstack
+        ports:
+          - 4566:4566
+          - 4510-4559:4510-4559
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -25,8 +31,8 @@ jobs:
       - name: Install testing dependencies
         run: pip3 install -e '.[dev]'
 
-      - name: Run the bootstrap
-        run: ./bootstrap
+      - name: Create the test.env file
+        run: mkdir -p build && echo "export ENDPOINT_URL=http://localhost:4566" > build/test.env
 
       - name: Run flake8 tests
         run: flake8 --output build/flake8.txt --tee
