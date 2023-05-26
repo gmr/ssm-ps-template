@@ -1,0 +1,84 @@
+#!/bin/sh
+set -e
+
+# Common constants
+COLOR_RESET='\033[0m'
+COLOR_GREEN='\033[0;32m'
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-${PWD##*/}}"
+DOCKER_HOST="${DOCKER_HOST:-localhost}"
+TEST_HOST=`echo -n ${DOCKER_HOST} | awk -F[/:] '{print $4}'`
+if [ "${DOCKER_HOST}" == "localhost" ]
+then
+    TEST_HOST=${DOCKER_HOST}
+fi
+
+echo "Integration test host: ${TEST_HOST}"
+
+get_container() {
+  docker compose ps -q $1
+}
+
+get_ipaddr() {
+  docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1
+}
+
+get_exposed_port() {
+  docker compose port $1 $2 | cut -d: -f2
+}
+
+report_start() {
+  printf "Waiting for $1 ... "
+}
+
+report_done() {
+  printf "${COLOR_GREEN}done${COLOR_RESET}\n"
+}
+
+wait_for_healthy_containers() {
+  IDs=$(docker compose ps -q | paste -sd " " -)
+  report_start "${1} containers to report healthy     "
+  counter="0"
+  while true
+  do
+    if [ "$(docker inspect -f "{{.State.Health.Status}}" ${IDs} | grep -c healthy)" -eq "${1}" ]; then
+      break
+    fi
+    counter=$((++counter))
+    if [ "${counter}" -eq 120 ]; then
+      echo " ERROR: containers failed to start"
+      exit 1
+    fi
+    sleep 1
+  done
+  report_done
+}
+
+# Ensure Docker is Running
+echo "Docker Information:"
+echo ""
+docker version
+echo ""
+
+# Activate the virtual environment
+if test -e env/bin/activate
+then
+  . ./env/bin/activate
+fi
+
+mkdir -p build
+
+# Stop any running instances and clean up after them, then pull images
+docker compose down --volumes --remove-orphans
+docker compose pull -q
+docker compose up -d --quiet-pull localstack
+
+wait_for_healthy_containers 1
+
+cat > build/test.env <<EOF
+export AWS_ACCESS_KEY_ID=local
+export AWS_SECRET_ACCESS_KEY=development
+export ENVIRONMENT=development
+export ENDPOINT_URL=http://${TEST_HOST}:$(get_exposed_port localstack 4566)
+EOF
+
+printf "\nBootstrap complete\n"

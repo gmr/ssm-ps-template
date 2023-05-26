@@ -18,6 +18,7 @@ class TestCase1(unittest.TestCase):
                     source=pathlib.Path('tests/templates/case1b.tmpl'),
                     destination=pathlib.Path('build/case1b.out'),
                     prefix=None)],
+            endpoint_url=None,
             profile=None,
             region=None,
             verbose=False)

@@ -25,8 +25,8 @@ jobs:
       - name: Install testing dependencies
         run: pip3 install -e '.[dev]'
 
-      - name: Create build directory
-        run: mkdir build
+      - name: Run the bootstrap
+        run: ./bootstrap
 
       - name: Run flake8 tests
         run: flake8 --output build/flake8.txt --tee
