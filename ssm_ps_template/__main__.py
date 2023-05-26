@@ -25,6 +25,9 @@ def parse_cli_arguments() -> argparse.Namespace:
     parser.add_argument('--prefix', action='store',
                         help='Default SSM Key Prefix',
                         default=os.environ.get('PARAMS_PREFIX', ''))
+    parser.add_argument('--replace-underscores', action='store_true',
+                        help=('Replace underscores in variable names to dashes'
+                              ' when looking for values in SSM'))
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('config', type=config.configuration_file, nargs=1)
     return parser.parse_args()
@@ -51,7 +54,8 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
         variables = sorted(variable_discovery.discover())
 
         try:
-            values = parameter_store.fetch_variables(variables, prefix)
+            values = parameter_store.fetch_variables(
+                variables, prefix, args.replace_underscores)
         except (exceptions.ClientError,
                 exceptions.UnauthorizedSSOTokenError) as err:
             LOGGER.error('Error fetching parameters: %s', err)

@@ -118,7 +118,12 @@ optional arguments:
                         AWS Profile
   --aws-region AWS_REGION
                         AWS Region
+  --endpoint-url ENDPOINT_URL
+                        Specify an endpoint URL to use when contacting SSM Parameter Store.
   --prefix PREFIX       Default SSM Key Prefix
+  --replace-underscores
+                        Replace underscores in variable names to dashes when looking for values in SSM
   --verbose
 ```
-Note that the default SSM prefix can also be set with the `PARAMS_PREFIX` environment variable.
+Note that the default SSM prefix can also be set with the `PARAMS_PREFIX` environment variable and
+the endpoint URL setting cn be set with the `ENDPOINT_URL` environment variable.

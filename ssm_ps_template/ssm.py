@@ -19,7 +19,9 @@ class ParameterStore:
 
     def fetch_variables(self,
                         variables: list,
-                        prefix: str) -> typing.Dict[str, str]:
+                        prefix: str,
+                        replace_underscores: bool) -> typing.Dict[str, str]:
+
         # Build the variables
         names = [
             '/'.join([prefix.rstrip('/'), v])
@@ -29,9 +31,13 @@ class ParameterStore:
         paths = [name for name in names if name.endswith('/')]
         names = [name for name in names if not name.endswith('/')]
 
-        LOGGER.debug('Fetching %r', names)
+        if replace_underscores:
+            paths = [value.replace('_', '-') for value in paths]
+            names = [value.replace('_', '-') for value in names]
 
         values = {}
+
+        LOGGER.debug('Fetching %r', names)
         while names:
             response = self._client.get_parameters(
                 Names=names[:10], WithDecryption=True)
@@ -40,15 +46,18 @@ class ParameterStore:
             names = names[10:]
 
         path_values = flatdict.FlatDict(delimiter='/')
+        LOGGER.debug('Fetching %r', paths)
         for path in paths:
             paginator = self._client.get_paginator('get_parameters_by_path')
             for page in paginator.paginate(
                     Path=path, Recursive=True, WithDecryption=True):
                 for param in page['Parameters']:
                     LOGGER.debug('Param %r', param)
-                    path_values = self.add_parameter(param, prefix, variables,
-                                                     path_values)
+                    path_values = self.add_parameter(
+                        param, prefix, variables, path_values)
         for key, value in path_values.as_dict().items():
+            if replace_underscores:
+                key = key.replace('-', '_')
             values[f'{key}/'] = value
 
         LOGGER.debug('Returning %r', values)
@@ -64,6 +73,8 @@ class ParameterStore:
         StringList to a list of strings.
 
         """
+        prefix = prefix.replace('-', '_')
+        param['Name'] = param['Name'].replace('-', '_')
         if param['Name'].startswith(prefix) and param['Name'] not in variables:
             param['Name'] = param['Name'][len(prefix):]
         if param['Type'] == 'StringList':

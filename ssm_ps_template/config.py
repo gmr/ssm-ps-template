@@ -17,10 +17,11 @@ class Template:
 
 @dataclasses.dataclass
 class Configuration:
-    templates: list[Template]
     endpoint_url: typing.Optional[str]
     profile: typing.Optional[str]
     region: typing.Optional[str]
+    replace_underscores: typing.Optional[bool]
+    templates: list[Template]
     verbose: bool
 
 
@@ -36,10 +37,11 @@ def _load_configuration(value: dict) -> Configuration:
         raise argparse.ArgumentTypeError(
             f'Failed to load configuration due to invalid key: {error}')
     return Configuration(
-        templates=templates,
         endpoint_url=value.get('endpoint_url'),
         profile=value.get('profile'),
         region=value.get('region'),
+        replace_underscores=value.get('replace_underscores', False),
+        templates=templates,
         verbose=value.get('verbose', False))
 
 

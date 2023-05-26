@@ -21,6 +21,7 @@ class TestCase1(unittest.TestCase):
             endpoint_url=None,
             profile=None,
             region=None,
+            replace_underscores=False,
             verbose=False)
 
     def test_load_json_file(self):
