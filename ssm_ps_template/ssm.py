@@ -11,9 +11,10 @@ class ParameterStore:
 
     def __init__(self,
                  profile: typing.Optional[str] = None,
-                 region: typing.Optional[str] = None):
+                 region: typing.Optional[str] = None,
+                 endpoint_url: typing.Optional[str] = None):
         self._session = boto3.Session(profile_name=profile, region_name=region)
-        self._client = self._session.client('ssm')
+        self._client = self._session.client('ssm', endpoint_url=endpoint_url)
         self._ssm = boto3.client('ssm')
 
     def fetch_variables(self,

@@ -20,12 +20,13 @@ The configuration file provides the ability to specify multiple templates, overr
 
 ### Top-Level Configuration Directives
 
-| Directive   | Description                                                                                                                      |
-|-------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `templates` | An array of template directives as detailed in the next table.                                                                   |
-| `profile`   | Specify the AWS profile to use. If unspecified will default to the `AWS_DEFAULT_PROFILE` environment variable or is unspecified  |
-| `region`    | Specify the AWS region to use. If unspecified it will default to the `AWS_DEFAULT_REGION` environment variable or is unspecified |
-| `verbose`   | Turn debug logging on. Possible values are `true` and `false`                                                                    |
+| Directive      | Description                                                                                                                      |
+|----------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `templates`    | An array of template directives as detailed in the next table.                                                                   |
+| `endpoint_url` | Specify an endpoint URL to use to override the default URL used to contact SSM Parameter Store                                   |
+| `profile`      | Specify the AWS profile to use. If unspecified will default to the `AWS_DEFAULT_PROFILE` environment variable or is unspecified  |
+| `region`       | Specify the AWS region to use. If unspecified it will default to the `AWS_DEFAULT_REGION` environment variable or is unspecified |
+| `verbose`      | Turn debug logging on. Possible values are `true` and `false`                                                                    |
 
 ### Template Configuration Directives
 

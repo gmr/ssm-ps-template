@@ -18,6 +18,7 @@ class Template:
 @dataclasses.dataclass
 class Configuration:
     templates: list[Template]
+    endpoint_url: typing.Optional[str]
     profile: typing.Optional[str]
     region: typing.Optional[str]
     verbose: bool
@@ -36,6 +37,7 @@ def _load_configuration(value: dict) -> Configuration:
             f'Failed to load configuration due to invalid key: {error}')
     return Configuration(
         templates=templates,
+        endpoint_url=value.get('endpoint_url'),
         profile=value.get('profile'),
         region=value.get('region'),
         verbose=value.get('verbose', False))
