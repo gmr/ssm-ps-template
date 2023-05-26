@@ -31,15 +31,16 @@ jobs:
       - name: Install testing dependencies
         run: pip3 install -e '.[dev]'
 
-      - name: Create the test.env file
-        run: mkdir -p build && echo "export ENDPOINT_URL=http://localhost:4566" > build/test.env
-
       - name: Run flake8 tests
         run: flake8 --output build/flake8.txt --tee
 
       - name: Run tests
         run: coverage run && coverage report && coverage xml
-
+        env:
+          AWS_REGION=development
+          AWS_ACCESS_KEY_ID=local
+          AWS_SECRET_ACCESS_KEY=development
+          ENDPOINT_URL=http://localhost:4566
       - name: Upload Coverage
         uses: codecov/codecov-action@v1.0.2
         if: github.event_name == 'push' && github.repository == 'gmr/ssm-ps-template'

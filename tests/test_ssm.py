@@ -1,5 +1,6 @@
 import os
 import pathlib
+import sys
 import typing
 import unittest
 import uuid
@@ -14,7 +15,8 @@ def load_test_env() -> None:
     if not path.exists():
         path = pathlib.Path('../build/test.env')
         if not path.exists():
-            raise RuntimeError('Failed to find test.env file')
+            sys.stderr.write('Failed to find test.env.file\n')
+            return
     try:
         with path.open('r') as f:
             for line in f:
