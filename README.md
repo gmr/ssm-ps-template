@@ -33,14 +33,14 @@ baz: qux
 Additionally, there is another function exposed `get_parameters_by_path(path: str, default: typing.Optional[dict] = None)` which will return a dictionary for the specified path.
 
 The following example will iterate over the results:
-```
+```yaml
 {% for key, value in get_parameters_by_path('settings/', {}).items() %}
   {{ key }}: {{ value }}
 {% endfor %}
 ```
 
 Or you can use a Jinja filter to convert them to YAML:
-```
+```yaml
 {{ get_parameters_by_path('settings/') | toyaml | indent(2, first=True) }}
 ```
 
@@ -52,7 +52,7 @@ For values in ParameterStore that are stored as `StringList`, they are automatic
 
 And the following template:
 
-```
+```yaml
 Connections:
 {% for connection in get_parameter('/my-application/connections', []) %}
   - {{ connection }}
