@@ -25,7 +25,7 @@ def parse_cli_arguments(args: typing.Optional[typing.List[str]] = None) \
                         default=os.environ.get('SSM_ENDPOINT_URL'))
     parser.add_argument('--prefix', action='store',
                         help='Default SSM Key Prefix',
-                        default=os.environ.get('PARAMS_PREFIX', ''))
+                        default=os.environ.get('PARAMS_PREFIX', '/'))
     parser.add_argument('--replace-underscores', action='store_true',
                         help=('Replace underscores in variable names to dashes'
                               ' when looking for values in SSM'))
@@ -41,13 +41,7 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
         endpoint_url=args.endpoint_url or args.config[0].endpoint_url)
 
     for template in args.config[0].templates:
-        if not args.prefix and not template.prefix:
-            LOGGER.error('The prefix for %s must not be empty.',
-                         template.source)
-            sys.exit(1)
-
         start_time = time.time()
-
         prefix = (args.prefix or template.prefix).rstrip('/')
 
         variable_discovery = discovery.VariableDiscovery(template.source)
@@ -58,7 +52,7 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
                 variables, prefix, args.replace_underscores)
         except ssm.SSMClientException as err:
             LOGGER.error('Error fetching parameters: %s', err)
-            sys.exit(2)
+            sys.exit(1)
 
         renderer = render.Renderer(source=template.source)
         with template.destination.open('w') as handle:

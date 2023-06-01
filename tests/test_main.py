@@ -27,13 +27,6 @@ class MainTestCase(utils.ParameterStoreTestCase):
 
         self.assertEqual(result.strip(), expectation.strip())
 
-    def test_render_templates_exists_without_prefix(self):
-        args = __main__.parse_cli_arguments([
-            str(utils.TEST_DATA_PATH / 'main/config.toml')])
-        with self.assertRaises(SystemExit) as system_exit:
-            __main__.render_templates(args)
-        self.assertEqual(str(system_exit.exception), '1')
-
     def test_ssm_error_exits(self):
         args = __main__.parse_cli_arguments([
             '--prefix', '/my-application',
@@ -44,4 +37,4 @@ class MainTestCase(utils.ParameterStoreTestCase):
             func.side_effect = ssm.SSMClientException('Mock Error')
             with self.assertRaises(SystemExit) as system_exit:
                 __main__.render_templates(args)
-            self.assertEqual(str(system_exit.exception), '2')
+            self.assertEqual(str(system_exit.exception), '1')

@@ -14,6 +14,12 @@ pip install ssm-ps-template
 
 The application uses [Jinja2](https://jinja.palletsprojects.com/en/3.1.x/) for the templating engine. All functionality available to Jinja2 templates by default are exposed in the application.
 
+### Using Prefixes
+
+The application has a default prefix of `/` that is prepended to parameter names that do not start with a leading slash.
+
+This functionality allows you to group your variables under a path prefix like `/my-application/settings` and then only refer to the individual key values like `password` instead of referencing the full path of `/my-application/settings/password`.
+
 ### Getting Parameter Store Values
 
 The application exposes `get_parameter(name: str, default: typing.Optional[str] = None)` in templates to access the values in SSM Parameter Store.
