@@ -1,0 +1,5 @@
+/my-application/baz: qux
+/my-application/foo: bar
+/my-application/values:
+  - value 1
+  - value 2

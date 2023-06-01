@@ -1,46 +1,26 @@
-import pathlib
 import unittest
 
 import yaml
 
-from ssm_ps_template import discover, render
+from ssm_ps_template import render, ssm
+from tests import utils
 
 
-class RenderingTestCase(unittest.TestCase):
+class DiscoveryTestCase(unittest.TestCase):
 
-    def test_case1a(self):
-        variables = discover.Variables(
-            pathlib.Path('tests/templates/case1a.tmpl'))
-        renderer = render.Renderer(pathlib.Path('tests/templates/case1a.tmpl'),
-                                   list(variables.discover()))
+    def test_render(self):
+        with (utils.TEST_DATA_PATH / 'render/values.yaml').open() as handle:
+            data = yaml.safe_load(handle)
 
-        output = renderer.render({
-            'ssm_variable': 'Variable',
-            'foo/bar/baz': 'Corgie!',
-            'complex/': {
-                'foo': 'bar',
-                'baz': 'corgie'
-            }
-        })
-        with open('tests/expectations/case1a.out', 'r') as handle:
-            expectation = handle.read()
+        values = ssm.Values(
+            parameters=data['parameters'],
+            parameters_by_path=data['parameters_by_path'])
 
-        value = yaml.safe_load(output)
-        expected = yaml.safe_load(expectation)
-        self.assertDictEqual(value, expected)
-        self.assertEqual(
-            output.split('\n')[0].strip(),
-            expectation.split('\n')[0].strip())
+        renderer = render.Renderer(
+            utils.TEST_DATA_PATH / 'render/template.yaml.j2')
+        result = renderer.render(values)
 
-    def test_case1b(self):
-        variables = discover.Variables(
-            pathlib.Path('tests/templates/case1b.tmpl'))
-        renderer = render.Renderer(pathlib.Path('tests/templates/case1b.tmpl'),
-                                   list(variables.discover()))
-        output = renderer.render({
-            '/foo/bar/baz': 'postgresql://localhost:5432/postgres',
-            '/qux/corgie': 'redis://localhost:6379/0'
-        })
-        with open('tests/expectations/case1b.out', 'r') as handle:
-            expectation = handle.read()
-        self.assertEqual(output.strip(), expectation.strip())
+        path = utils.TEST_DATA_PATH / 'render/expectation.yaml'
+        expectation = path.read_text('utf-8')
+
+        self.assertEqual(result.strip(), expectation.strip())

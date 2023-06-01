@@ -1,0 +1,24 @@
+parameters:
+  - ack
+  - class
+  - connections
+  - drop_exchange
+  - drop_invalid_messages
+  - error_exchange
+  - error_max_retry
+  - log_stats
+  - max_errors
+  - message_type
+  - poll_interval
+  - qos_prefetch
+  - qty
+  - queue
+  - sentry_dsn
+  - statsd/enabled
+  - statsd/host
+  - statsd/include_hostname
+  - statsd/port
+  - statsd/tcp
+parameters_by_path:
+  - loggers/
+  - settings/

@@ -78,7 +78,7 @@ cat > build/test.env <<EOF
 export AWS_ACCESS_KEY_ID=local
 export AWS_SECRET_ACCESS_KEY=development
 export ENVIRONMENT=development
-export ENDPOINT_URL=http://${TEST_HOST}:$(get_exposed_port localstack 4566)
+export SSM_ENDPOINT_URL=http://${TEST_HOST}:$(get_exposed_port localstack 4566)
 EOF
 
 printf "\nBootstrap complete\n"

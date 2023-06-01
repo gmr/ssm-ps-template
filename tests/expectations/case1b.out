@@ -1,3 +1,0 @@
-[database]
-pgsql = postgresql://localhost:5432/postgres
-redis = redis://localhost:6379/0

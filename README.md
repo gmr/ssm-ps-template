@@ -12,7 +12,41 @@ pip install ssm-ps-template
 
 ## Templating
 
-The application uses [Jinja2](https://jinja.palletsprojects.com/en/3.1.x/) for the templating engine.
+The application uses [Jinja2](https://jinja.palletsprojects.com/en/3.1.x/) for the templating engine. All functionality available to Jinja2 templates by default are exposed in the application.
+
+### Getting Parameter Store Values
+
+The application exposes `get_parameter(name: str, default: typing.Optional[str] = None)` in templates to access the values in SSM Parameter Store.
+
+In the following example we assume there are Parameter Store values for the keys `/my-application/foo` and `/my-application/bar` and that the application is called with a prefix of `/my-appliction`:
+
+```yaml
+foo: {{ get_parameter('/my-application/foo'}}
+bar: {{ get_parameter('/my-application/bar'}}
+```
+Will render as:
+```yaml
+foo: bar
+baz: qux
+```
+
+Additionally, there is another function exposed `get_parameters_by_path(path: str, default: typing.Optional[str] = None)` which will return a dictionary for the specified path.
+
+The following example will iterate over the results:
+```
+{% for key, value in get_parameters_by_path('settings/').items() %}
+  {{ key }}: {{ value }}
+{% endfor %}
+```
+
+Or you can use a Jinja filter to convert them to YAML:
+```
+{{ get_parameters_by_path('settings/') | toyaml | indent(2, first=True) }}
+```
+
+### Performance Considerations
+
+The parameter names are gathered in a pre-processing step to minimize calls to SSM Parameter Store.
 
 ## Configuration
 
@@ -20,13 +54,14 @@ The configuration file provides the ability to specify multiple templates, overr
 
 ### Top-Level Configuration Directives
 
-| Directive      | Description                                                                                                                      |
-|----------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `templates`    | An array of template directives as detailed in the next table.                                                                   |
-| `endpoint_url` | Specify an endpoint URL to use to override the default URL used to contact SSM Parameter Store                                   |
-| `profile`      | Specify the AWS profile to use. If unspecified will default to the `AWS_DEFAULT_PROFILE` environment variable or is unspecified  |
-| `region`       | Specify the AWS region to use. If unspecified it will default to the `AWS_DEFAULT_REGION` environment variable or is unspecified |
-| `verbose`      | Turn debug logging on. Possible values are `true` and `false`                                                                    |
+| Directive             | Description                                                                                                                      |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `templates`           | An array of template directives as detailed in the next table.                                                                   |
+| `endpoint_url`        | Specify an endpoint URL to use to override the default URL used to contact SSM Parameter Store                                   |
+| `profile`             | Specify the AWS profile to use. If unspecified will default to the `AWS_DEFAULT_PROFILE` environment variable or is unspecified  |
+| `region`              | Specify the AWS region to use. If unspecified it will default to the `AWS_DEFAULT_REGION` environment variable or is unspecified |
+| `replace_underscores` | Replace underscores with dashes when asking for values from SSM Parameter Store                                                  |
+| `verbose`             | Turn debug logging on. Possible values are `true` and `false`                                                                    |
 
 ### Template Configuration Directives
 
@@ -42,11 +77,13 @@ The `templates` directive in the configuration is an array of objects, defined b
 
 In addition to the base functionality exposed by Jinja2, the following Python functions have been added:
 
-| Function   | Definition                                                                                                                                          |
-|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `urlparse` | The [`urllib.parse.urlparse`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlparse) function from the Python standard library. |
-| `parse_qs` | The [`urllib.parse.parse_qs`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.parse_qs) function from the Python standard library. |
-| `unquote`  | The [`urllib.parse.unquote`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote) function from the Python standard library.   |
+| Function                 | Definition                                                                                                                                          |
+|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `get_parameter`          | Get a string value from SSM Parameter Store                                                                                                         |
+| `get_parameters_by_path` | Get a dictionary value from SSM Parameter Store                                                                                                     |
+| `urlparse`               | The [`urllib.parse.urlparse`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlparse) function from the Python standard library. |
+| `parse_qs`               | The [`urllib.parse.parse_qs`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.parse_qs) function from the Python standard library. |
+| `unquote`                | The [`urllib.parse.unquote`](https://docs.python.org/3/library/urllib.parse.html#urllib.parse.unquote) function from the Python standard library.   |
 
 The following filters are added:
 
@@ -79,29 +116,6 @@ region: us-east-1
 verbose: false
 ```
 
-## Path Based Dictionaries
-
-In more complex templates it's possible to need a dictionary of values from SSM instead of straight key/value usage.
-
-This is achieved by setting a variable to a key with a trailing slash (`/`).
-
-The following pattern will retrieve all keys under a path and return them as a nested dictionary with a `/` delimiter,
-and then iterate over the key/value pairs:
-
-```
-{% set values = settings/ %}
-{% for key, value in settings.items() %}
-  {{ key }}: {{ value }}
-{% endfor %}
-```
-
-Or to convert them to YAML:
-
-```
-settings: {% set values = settings/ %}
-{{ values | toyaml | indent(2, first=True) }}
-```
-
 ## Command Line Usage
 
 ```
@@ -118,7 +132,7 @@ optional arguments:
                         AWS Profile
   --aws-region AWS_REGION
                         AWS Region
-  --endpoint-url ENDPOINT_URL
+  --endpoint-url SSM_ENDPOINT_URL
                         Specify an endpoint URL to use when contacting SSM Parameter Store.
   --prefix PREFIX       Default SSM Key Prefix
   --replace-underscores
@@ -126,4 +140,4 @@ optional arguments:
   --verbose
 ```
 Note that the default SSM prefix can also be set with the `PARAMS_PREFIX` environment variable and
-the endpoint URL setting cn be set with the `ENDPOINT_URL` environment variable.
+the endpoint URL setting cn be set with the `SSM_ENDPOINT_URL` environment variable.

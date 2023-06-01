@@ -1,4 +1,3 @@
-import io
 import logging
 import os
 import pathlib
@@ -8,41 +7,40 @@ from urllib import parse
 import yaml
 from jinja2 import sandbox
 
+from ssm_ps_template import ssm
+
 LOGGER = logging.getLogger(__name__)
 
 
 class Renderer:
 
-    def __init__(self, source: pathlib.Path, variables: typing.List[str]):
+    def __init__(self, source: pathlib.Path):
         with source.open('r') as handle:
             self._source = handle.read()
-        self._buffer = io.StringIO()
-        self._variables = variables
+        self._values: typing.Optional[ssm.Values] = None
 
-    def render(self, values: typing.Dict) -> str:
+    def render(self, values: ssm.Values) -> str:
         """Render the template to the internal buffer"""
+        self._values = values
         environment = sandbox.ImmutableSandboxedEnvironment()
+        environment.globals['get_parameter'] = self._get_parameter
+        environment.globals['get_parameters_by_path'] = \
+            self._get_parameters_by_path
         environment.filters['toyaml'] = lambda v: yaml.safe_dump(v)
         environment.globals['parse_qs'] = parse.parse_qs
         environment.globals['unquote'] = parse.unquote
         environment.globals['urlparse'] = parse.urlparse
+        return environment.from_string(self._source).render(
+            **{'environ': os.environ})
 
-        variables = {}
-        for key in self._variables:
-            variables[self._sanitize_variable(key)] = values.get(key)
-        variables['environ'] = os.environ
+    def _get_parameter(self,
+                       key: str,
+                       default: typing.Optional[str] = None) \
+            -> typing.Optional[str]:
+        return self._values.parameters.get(key, default)
 
-        template = environment.from_string(self._patched_source())
-        return template.render(**variables)
-
-    def _patched_source(self) -> str:
-        """Replace `foo/bar/baz` variables with `foo__bar__baz`"""
-        source = str(self._source)
-        for var in self._variables:
-            if var != self._sanitize_variable(var):
-                source = source.replace(var, self._sanitize_variable(var))
-        return source
-
-    @staticmethod
-    def _sanitize_variable(value: str) -> str:
-        return value.replace('/', '___').replace('-', '_')
+    def _get_parameters_by_path(self,
+                                path: str,
+                                default: typing.Optional[str] = None) \
+            -> typing.Optional[dict]:
+        return self._values.parameters_by_path.get(path, default)

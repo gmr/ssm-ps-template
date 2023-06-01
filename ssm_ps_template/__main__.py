@@ -6,22 +6,23 @@ import time
 import typing
 from importlib import metadata
 
-from botocore import exceptions
-
-from ssm_ps_template import config, discover, render, ssm
+from ssm_ps_template import config, discovery, render, ssm
 
 LOGGER = logging.getLogger(__name__)
 
 
-def parse_cli_arguments() -> argparse.Namespace:
+def parse_cli_arguments(args: typing.Optional[typing.List[str]] = None) \
+        -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description='Templating for SSM Parameter Store')
-    parser.add_argument('--aws-profile', action='store', help='AWS Profile')
-    parser.add_argument('--aws-region', action='store', help='AWS Region')
+    parser.add_argument('--aws-profile', action='store', help='AWS Profile',
+                        default=os.environ.get('AWS_PROFILE'))
+    parser.add_argument('--aws-region', action='store', help='AWS Region',
+                        default=os.environ.get('AWS_REGION'))
     parser.add_argument('--endpoint-url', action='store',
                         help=('Specify an endpoint URL to use when contacting '
                               'SSM Parameter Store.'),
-                        default=os.environ.get('ENDPOINT_URL'))
+                        default=os.environ.get('SSM_ENDPOINT_URL'))
     parser.add_argument('--prefix', action='store',
                         help='Default SSM Key Prefix',
                         default=os.environ.get('PARAMS_PREFIX', ''))
@@ -30,7 +31,7 @@ def parse_cli_arguments() -> argparse.Namespace:
                               ' when looking for values in SSM'))
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('config', type=config.configuration_file, nargs=1)
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def render_templates(args: argparse.Namespace) -> typing.NoReturn:
@@ -39,29 +40,27 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
         region=args.aws_region or args.config[0].region,
         endpoint_url=args.endpoint_url or args.config[0].endpoint_url)
 
-    start_time = time.time()
     for template in args.config[0].templates:
         if not args.prefix and not template.prefix:
             LOGGER.error('The prefix for %s must not be empty.',
                          template.source)
             sys.exit(1)
 
-        prefix = args.prefix or template.prefix
-        if not prefix.endswith('/'):
-            prefix = f'{args.prefix}/'
+        start_time = time.time()
 
-        variable_discovery = discover.Variables(template.source)
-        variables = sorted(variable_discovery.discover())
+        prefix = (args.prefix or template.prefix).rstrip('/')
+
+        variable_discovery = discovery.VariableDiscovery(template.source)
+        variables = variable_discovery.discover()
 
         try:
             values = parameter_store.fetch_variables(
                 variables, prefix, args.replace_underscores)
-        except (exceptions.ClientError,
-                exceptions.UnauthorizedSSOTokenError) as err:
+        except ssm.SSMClientException as err:
             LOGGER.error('Error fetching parameters: %s', err)
             sys.exit(2)
 
-        renderer = render.Renderer(source=template.source, variables=variables)
+        renderer = render.Renderer(source=template.source)
         with template.destination.open('w') as handle:
             handle.write(renderer.render(values))
 
@@ -69,9 +68,8 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
                     time.time() - start_time)
 
 
-def main():
+def main():  # pragma: no cover
     args = parse_cli_arguments()
-
     verbose = args.config[0].verbose or args.verbose
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     for logger in ['boto3', 'botocore', 'urllib3']:

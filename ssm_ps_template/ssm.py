@@ -1,10 +1,19 @@
+import dataclasses
 import logging
 import typing
 
 import boto3
-import flatdict
+from botocore import exceptions
+
+from ssm_ps_template import discovery
 
 LOGGER = logging.getLogger(__name__)
+
+
+@dataclasses.dataclass
+class Values:
+    parameters: typing.Dict[str, str]
+    parameters_by_path: typing.Dict[str, typing.Dict[str, str]]
 
 
 class ParameterStore:
@@ -18,70 +27,70 @@ class ParameterStore:
         self._ssm = boto3.client('ssm')
 
     def fetch_variables(self,
-                        variables: list,
+                        variables: discovery.Variables,
                         prefix: str,
-                        replace_underscores: bool) -> typing.Dict[str, str]:
+                        replace_underscores: bool) -> Values:
+        try:
+            return self._fetch_variables(
+                variables, prefix, replace_underscores)
+        except (exceptions.ClientError,
+                exceptions.UnauthorizedSSOTokenError) as err:
+            raise SSMClientException(str(err))
 
-        # Build the variables
-        names = [
-            '/'.join([prefix.rstrip('/'), v])
-            if prefix and not v.startswith('/') else v for v in variables
-        ]
+    def _fetch_variables(self,
+                         variables: discovery.Variables,
+                         prefix: str,
+                         replace_underscores: bool) -> Values:
+        values = Values({}, {})
 
-        paths = [name for name in names if name.endswith('/')]
-        names = [name for name in names if not name.endswith('/')]
+        names, name_map = self._build_names(
+            variables.parameters, prefix, replace_underscores)
 
-        if replace_underscores:
-            paths = [value.replace('_', '-') for value in paths]
-            names = [value.replace('_', '-') for value in names]
-
-        values = {}
-
-        LOGGER.debug('Fetching %r', names)
+        LOGGER.debug('Fetching Parameters %r', names)
         while names:
             response = self._client.get_parameters(
                 Names=names[:10], WithDecryption=True)
             for param in response['Parameters']:
-                values = self.add_parameter(param, prefix, variables, values)
+                values.parameters[name_map[param['Name']]] = \
+                    self._parameter_value(param)
             names = names[10:]
 
-        path_values = flatdict.FlatDict(delimiter='/')
-        LOGGER.debug('Fetching %r', paths)
-        for path in paths:
-            paginator = self._client.get_paginator('get_parameters_by_path')
-            for page in paginator.paginate(
-                    Path=path, Recursive=True, WithDecryption=True):
-                for param in page['Parameters']:
-                    LOGGER.debug('Param %r', param)
-                    path_values = self.add_parameter(
-                        param, prefix, variables, path_values)
-        for key, value in path_values.as_dict().items():
-            if replace_underscores:
-                key = key.replace('-', '_')
-            values[f'{key}/'] = value
+        names, name_map = self._build_names(
+            variables.parameters_by_path, prefix, replace_underscores)
+        for key in name_map.values():
+            values.parameters_by_path[key] = {}
 
-        LOGGER.debug('Returning %r', values)
+        LOGGER.debug('Fetching Parameters By Path %r', names)
+        for name in names:
+            response = self._client.get_parameters_by_path(
+                Path=name, Recursive=True, WithDecryption=True)
+            for param in response['Parameters']:
+                key = param['Name'][len(name):]
+                values.parameters_by_path[name_map[name]][key] = \
+                    self._parameter_value(param)
+
         return values
 
     @staticmethod
-    def add_parameter(param: dict,
-                      prefix: str,
-                      variables: typing.List[str],
-                      values: typing.Union[dict, flatdict.FlatDict]) \
-            -> dict:
-        """Process a parameter, stripping prefix if needed and coercing
-        StringList to a list of strings.
+    def _build_names(variables: set,
+                     prefix: str,
+                     replace_underscores: bool) \
+            -> typing.Tuple[typing.List[str], typing.Dict[str, str]]:
+        names, name_map = [], {}
+        for param in variables:
+            value = param.replace('_', '-') if replace_underscores else param
+            name = f'{prefix}/{value}'
+            name_map[name] = param
+            names.append(name)
+        return names, name_map
 
-        """
-        prefix = prefix.replace('-', '_')
-        param['Name'] = param['Name'].replace('-', '_')
-        if param['Name'].startswith(prefix) and param['Name'] not in variables:
-            param['Name'] = param['Name'][len(prefix):]
-        if param['Type'] == 'StringList':
-            values[param['Name']] = [
-                p for p in param['Value'].split(',') if p.strip()
-            ]
-            LOGGER.debug('%s = %r', param['Name'], values[param['Name']])
-        else:
-            values[param['Name']] = param['Value'].rstrip()
-        return values
+    @staticmethod
+    def _parameter_value(parameter: dict) \
+            -> typing.Union[str, typing.List[str]]:
+        if parameter['Type'] == 'StringList':
+            return [value.strip() for value in parameter['Value'].split(',')]
+        return parameter['Value'].rstrip()
+
+
+class SSMClientException(Exception):
+    pass

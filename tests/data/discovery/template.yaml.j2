@@ -1,0 +1,90 @@
+{%- set environment = environ.get('ENVIRONMENT', 'development') -%}
+{%- set application = environ.get('APPLICATION', 'consumer') -%}
+Application:
+  poll_interval: {{ get_parameter('poll_interval', '10.0') }}{% if get_parameter('sentry_dsn') %}
+  sentry_dsn: {{ get_parameter('sentry_dsn') }}{% endif %}
+  stats:
+    log: {{ get_parameter('log_stats', 'true') }}
+    influxdb:
+      enabled: false
+    statsd:
+      enabled: {{ get_parameter('statsd/enabled', 'true') }}
+      include_hostname: {{ get_parameter('statsd/include_hostname', 'false') }}
+      tcp:  {{ get_parameter('statsd/tcp', 'true') }}
+      host:  {{ get_parameter('statsd/host', 'statsd') }}
+      port: {{ get_parameter('statsd/port', '8125') }}
+      prefix: {{ get_parameter('statsd/port', 'applications.rejected.{}'.format(environment)) }}
+
+  Connections:{% for conn in get_parameter('connections', []) %}{% set connection = urlparse(conn) %}{% set query_args = parse_qs(connection.query) %}{% set port = 5671 if connection.scheme == 'amqps' else 5672 %}
+    {{ connection.hostname }}:
+      host: {{ connection.hostname }}
+      port: {{ connection.port or port }}
+      vhost: {{ unquote(connection.path.lstrip('/')) or '/' }}
+      user: {{ connection.username or 'guest' }}
+      password: {{ connection.password or 'guest' }}
+{%- if connection.scheme == 'amqps' %}
+      ssl_options:
+        protocol: 2{% endif %}
+      heartbeat_interval: {{ query_args.get('heartbeat_interval', [300])[0] }}
+{% endfor -%}
+
+  Consumers:
+    {{ application }}:
+      ack:  {{ get_parameter('ack', 'true') }}
+      connections: {% for conn in get_parameter('connections', []) %}{% set connection = urlparse(conn) %}
+        - name: {{ connection.hostname }}
+          publisher_confirmation: false
+          consume: true{% endfor %}
+      consumer: {{ get_parameter('class', 'rejected.consumer.Consumer') }}
+      max_errors: {{ get_parameter('max_errors', '5') }}
+      qos_prefetch: {{ get_parameter('qos_prefetch', '5') }}
+      qty: {{ get_parameter('qty', '1') }}
+      queue: {{ get_parameter('queue', application) }}{%- if get_parameter('drop_exchange') is not none %}
+      drop_exchange: {{ get_parameter('drop_exchange') }}{% endif %}{%- if get_parameter('drop_invalid_messages') is not none %}
+      drop_invalid_messages: {{ get_parameter('drop_invalid_messages') }}{% endif %}{%- if get_parameter('message_type') is not none %}
+      message_type: {{ get_parameter('message_type') }}{% endif %}{%- if get_parameter('error_exchange') is not none %}
+      error_exchange: {{ get_parameter('error_exchange') }}{% endif %}{%- if get_parameter('error_max_retry') is not none %}
+      error_max_retry: {{ get_parameter('error_max_retry') }}{% endif %}{% if get_parameters_by_path('settings/') %}
+      config:
+{{ get_parameters_by_path('settings/') | toyaml | indent(8, first=True) }}
+{% endif %}{%- endif -%}
+
+Daemon: {}
+
+Logging:
+  version: 1
+  formatters:
+    verbose:
+      format: "%(levelname) -10s %(asctime)s %(process)-6d %(processName) -25s %(name) -20s %(funcName) -25s: %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+  filters: {}
+  handlers:
+    console:
+      class: logging.StreamHandler
+      formatter: jsonlines
+      stream: "ext://sys.stdout"
+  loggers:
+    helper:
+      level: INFO
+      propagate: true
+    pika:
+      level: WARNING
+      propagate: true
+    rejected:
+      level: INFO
+      propagate: true
+    tornado:
+      level: WARNING
+      propagate: true
+    {{ application }}:
+      level: INFO
+      propagate: true{% for logger, level in get_parameters_by_path('loggers/').items() %}
+    {{ logger }}:
+      level: {{ level }}
+      propagate: true
+{%- endfor %}
+  root:
+    level: INFO
+    handlers: [console]
+  disable_existing_loggers: true
+  incremental: false

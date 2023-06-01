@@ -1,0 +1,91 @@
+Application:
+  poll_interval: 10.0
+  stats:
+    log: False
+    influxdb:
+      enabled: false
+    statsd:
+      enabled: False
+      include_hostname: false
+      tcp:  true
+      host:  statsd
+      port: 8125
+      prefix: applications.rejected.development
+
+  Connections:
+    localhost:
+      host: localhost
+      port: 5672
+      vhost: /
+      user: guest
+      password: guest
+      heartbeat_interval: 300
+
+    foo:
+      host: foo
+      port: 5671
+      vhost: test
+      user: guest
+      password: guest
+      ssl_options:
+        protocol: 2
+      heartbeat_interval: 300
+Consumers:
+    consumer:
+      ack:  True
+      connections: 
+        - name: localhost
+          publisher_confirmation: false
+          consume: true
+        - name: foo
+          publisher_confirmation: false
+          consume: true
+      consumer: myconsumer.Consumer
+      max_errors: 5
+      qos_prefetch: 100
+      qty: 1
+      queue: foo-queue
+      error_exchange: error-exchange
+      config:
+        baz: qux
+        foo: bar
+
+
+Daemon: {}
+
+Logging:
+  version: 1
+  formatters:
+    verbose:
+      format: "%(levelname) -10s %(asctime)s %(process)-6d %(processName) -25s %(name) -20s %(funcName) -25s: %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+  filters: {}
+  handlers:
+    console:
+      class: logging.StreamHandler
+      formatter: jsonlines
+      stream: "ext://sys.stdout"
+  loggers:
+    helper:
+      level: INFO
+      propagate: true
+    pika:
+      level: WARNING
+      propagate: true
+    rejected:
+      level: INFO
+      propagate: true
+    tornado:
+      level: WARNING
+      propagate: true
+    consumer:
+      level: INFO
+      propagate: true
+    boto3:
+      level: INFO
+      propagate: true
+  root:
+    level: INFO
+    handlers: [console]
+  disable_existing_loggers: true
+  incremental: false

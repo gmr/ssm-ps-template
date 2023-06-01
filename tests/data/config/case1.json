@@ -1,12 +1,12 @@
 {
     "templates": [
         {
-            "source": "tests/templates/case1a.tmpl",
+            "source": "tests/data/config/case1a.tmpl",
             "destination": "build/case1a.out",
             "prefix": "/foo/bar/baz"
         },
         {
-            "source": "tests/templates/case1b.tmpl",
+            "source": "tests/data/config/case1b.tmpl",
             "destination": "build/case1b.out"
         }
     ]

@@ -1,0 +1,18 @@
+parameters:
+  ack: true
+  class: myconsumer.Consumer
+  connections:
+    - amqp://localhost:5672
+    - amqps://foo/test
+  error_exchange: error-exchange
+  log_stats: false
+  qos_prefetch: 100
+  qty: 1
+  queue: foo-queue
+  statsd/enabled: false
+parameters_by_path:
+  loggers/:
+    boto3: INFO
+  settings/:
+    foo: bar
+    baz: qux

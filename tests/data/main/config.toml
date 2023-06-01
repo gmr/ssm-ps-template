@@ -1,0 +1,3 @@
+[[templates]]
+source = "tests/data/main/test.yaml.j2"
+destination = "build/main-test.yaml"

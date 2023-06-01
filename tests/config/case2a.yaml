@@ -1,4 +1,0 @@
-templates:
-  - source: tests/templates/case1a.tmpl
-    destination: build/case1a.out
-  - source: tests/templates/case1b.tmpl
