@@ -2,7 +2,6 @@
 SSM Parameter Store Template
 ============================
 
-CLI application to render configuration templates, injecting variables from
-SSM Parameter Store.
+Command line application to render templates with data from SSM Parameter Stores
 
 """

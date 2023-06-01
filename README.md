@@ -151,9 +151,11 @@ verbose: false
 ## Command Line Usage
 
 ```
-usage: ssm-ps-template [-h] [--aws-profile AWS_PROFILE] [--aws-region AWS_REGION] [--prefix PREFIX] [--verbose] config
+usage: ssm-ps-template [-h] [--aws-profile AWS_PROFILE] [--aws-region AWS_REGION] [--endpoint-url ENDPOINT_URL] [--prefix PREFIX] [--replace-underscores]
+                       [--verbose] [--version]
+                       config
 
-Templating for SSM Parameter Store
+Command line application to render templates with data from SSM Parameter Store
 
 positional arguments:
   config
@@ -161,15 +163,16 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --aws-profile AWS_PROFILE
-                        AWS Profile
+                        AWS Profile (default: None)
   --aws-region AWS_REGION
-                        AWS Region
-  --endpoint-url SSM_ENDPOINT_URL
-                        Specify an endpoint URL to use when contacting SSM Parameter Store.
-  --prefix PREFIX       Default SSM Key Prefix
+                        AWS Region (default: None)
+  --endpoint-url ENDPOINT_URL
+                        Specify an endpoint URL to use when contacting SSM Parameter Store. (default: None)
+  --prefix PREFIX       Default SSM Key Prefix (default: /)
   --replace-underscores
-                        Replace underscores in variable names to dashes when looking for values in SSM
+                        Replace underscores in variable names to dashes when looking for values in SSM (default: False)
   --verbose
+  --version             show program's version number and exit
 ```
 Note that the default SSM prefix can also be set with the `PARAMS_PREFIX` environment variable and
 the endpoint URL setting cn be set with the `SSM_ENDPOINT_URL` environment variable.

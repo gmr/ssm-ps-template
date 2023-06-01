@@ -9,27 +9,37 @@ from importlib import metadata
 from ssm_ps_template import config, discovery, render, ssm
 
 LOGGER = logging.getLogger(__name__)
+LOGGING_FORMAT = '%(message)s'
 
 
 def parse_cli_arguments(args: typing.Optional[typing.List[str]] = None) \
         -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description='Templating for SSM Parameter Store')
-    parser.add_argument('--aws-profile', action='store', help='AWS Profile',
-                        default=os.environ.get('AWS_PROFILE'))
-    parser.add_argument('--aws-region', action='store', help='AWS Region',
-                        default=os.environ.get('AWS_REGION'))
-    parser.add_argument('--endpoint-url', action='store',
-                        help=('Specify an endpoint URL to use when contacting '
-                              'SSM Parameter Store.'),
-                        default=os.environ.get('SSM_ENDPOINT_URL'))
-    parser.add_argument('--prefix', action='store',
-                        help='Default SSM Key Prefix',
-                        default=os.environ.get('PARAMS_PREFIX', '/'))
-    parser.add_argument('--replace-underscores', action='store_true',
-                        help=('Replace underscores in variable names to dashes'
-                              ' when looking for values in SSM'))
+        description='Command line application to render templates with data '
+                    'from SSM Parameter Store',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument(
+        '--aws-profile', action='store', help='AWS Profile',
+        default=os.environ.get('AWS_PROFILE'))
+    parser.add_argument(
+        '--aws-region', action='store', help='AWS Region',
+        default=os.environ.get('AWS_REGION'))
+    parser.add_argument(
+        '--endpoint-url', action='store',
+        help=('Specify an endpoint URL to use when contacting '
+              'SSM Parameter Store.'),
+        default=os.environ.get('SSM_ENDPOINT_URL'))
+    parser.add_argument(
+        '--prefix', action='store', help='Default SSM Key Prefix',
+        default=os.environ.get('PARAMS_PREFIX', '/'))
+    parser.add_argument(
+        '--replace-underscores', action='store_true',
+        help='Replace underscores in variable names to dashes when looking '
+             'for values in SSM')
     parser.add_argument('--verbose', action='store_true')
+    parser.add_argument(
+        '--version', action='version',
+        version=f'%(prog)s {metadata.version("ssm-ps-template")}')
     parser.add_argument('config', type=config.configuration_file, nargs=1)
     return parser.parse_args(args)
 
@@ -65,7 +75,9 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
 def main():  # pragma: no cover
     args = parse_cli_arguments()
     verbose = args.config[0].verbose or args.verbose
-    logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
+    logging.basicConfig(
+        format=LOGGING_FORMAT,
+        level=logging.DEBUG if verbose else logging.INFO)
     for logger in ['boto3', 'botocore', 'urllib3']:
         logging.getLogger(logger).setLevel(logging.INFO)
 
