@@ -44,6 +44,28 @@ Or you can use a Jinja filter to convert them to YAML:
 {{ get_parameters_by_path('settings/') | toyaml | indent(2, first=True) }}
 ```
 
+For values in ParameterStore that are stored as `StringList`, they are automatically transformed as a list of strings. Given the following value:
+
+| Key                           | Value                            |
+|-------------------------------|----------------------------------|
+| `/my-application/connections` | `amqp://server1, amqp://server2` |
+
+And the following template:
+
+```
+Connections:
+{% for connection in get_parameter('/my-application/connections', []) %}
+  - {{ connection }}
+```
+
+The following would be rendered:
+
+```yaml
+Connections:
+  - amqp://server1
+  - amqp://server2
+```
+
 ### Performance Considerations
 
 The parameter names are gathered in a pre-processing step to minimize calls to SSM Parameter Store.
