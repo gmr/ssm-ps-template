@@ -79,7 +79,7 @@ class ParameterStore:
         names, name_map = [], {}
         for param in variables:
             value = param.replace('_', '-') if replace_underscores else param
-            name = f'{prefix}/{value}'
+            name = value if value.startswith('/') else f'{prefix}/{value}'
             name_map[name] = param
             names.append(name)
         return names, name_map

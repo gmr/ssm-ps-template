@@ -50,18 +50,20 @@ class ParameterStoreTestCase(utils.ParameterStoreTestCase):
             '/foo/bar/baz': str(uuid.uuid4()),
             '/foo/bar/corgie-qux': str(uuid.uuid4()),
             '/foo/bar/app-settings/value1': str(uuid.uuid4()),
-            '/foo/bar/app-settings/value2': str(uuid.uuid4())
+            '/foo/bar/app-settings/value2': str(uuid.uuid4()),
+            '/other-prefix/value': str(uuid.uuid4())
         }
         self.put_parameters(values)
 
         variables = discovery.Variables(
-            {'baz', 'corgie_qux'}, {'app_settings/'})
+            {'baz', 'corgie_qux', '/other-prefix/value'}, {'app_settings/'})
         result = self.ssm.fetch_variables(variables, '/foo/bar', True)
 
         expectation = ssm.Values(
             {
                 'baz': values['/foo/bar/baz'],
-                'corgie_qux': values['/foo/bar/corgie-qux']
+                'corgie_qux': values['/foo/bar/corgie-qux'],
+                '/other-prefix/value': values['/other-prefix/value']
             },
             {
                 'app_settings/': {
