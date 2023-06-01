@@ -2,6 +2,8 @@
 
 Command line application to render templates with data from SSM Parameter Store
 
+[![codecov](https://codecov.io/gh/gmr/ssm-ps-template/branch/main/graph/badge.svg?token=KGneS7mP9t)](https://codecov.io/gh/gmr/ssm-ps-template)
+
 ## Installation
 
 The `ssm-ps-template` application is available via the [Python Package Index](https://pypi.org/project/ssm-ps-template/) and can be installed with pip:
