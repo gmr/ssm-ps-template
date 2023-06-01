@@ -16,9 +16,11 @@ The application uses [Jinja2](https://jinja.palletsprojects.com/en/3.1.x/) for t
 
 ### Using Prefixes
 
-The application has a default prefix of `/` that is prepended to parameter names that do not start with a leading slash.
+The application has a default prefix of `/` that is prepended to parameter names that do not start with a leading slash (`/`).
 
 This functionality allows you to group your variables under a path prefix like `/my-application/settings` and then only refer to the individual key values like `password` instead of referencing the full path of `/my-application/settings/password`.
+
+If you reference a parameter name with a leading slash it will not prepend the prefix to the parameter name.
 
 ### Getting Parameter Store Values
 
