@@ -1,5 +1,6 @@
-import yaml
 from unittest import mock
+
+import yaml
 
 from ssm_ps_template import __main__, ssm
 from tests import utils
