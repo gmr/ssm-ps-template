@@ -30,11 +30,11 @@ foo: bar
 baz: qux
 ```
 
-Additionally, there is another function exposed `get_parameters_by_path(path: str, default: typing.Optional[str] = None)` which will return a dictionary for the specified path.
+Additionally, there is another function exposed `get_parameters_by_path(path: str, default: typing.Optional[dict] = None)` which will return a dictionary for the specified path.
 
 The following example will iterate over the results:
 ```
-{% for key, value in get_parameters_by_path('settings/').items() %}
+{% for key, value in get_parameters_by_path('settings/', {}).items() %}
   {{ key }}: {{ value }}
 {% endfor %}
 ```

@@ -41,6 +41,6 @@ class Renderer:
 
     def _get_parameters_by_path(self,
                                 path: str,
-                                default: typing.Optional[str] = None) \
+                                default: typing.Optional[dict] = None) \
             -> typing.Optional[dict]:
         return self._values.parameters_by_path.get(path, default)
