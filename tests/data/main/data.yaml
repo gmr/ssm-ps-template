@@ -3,3 +3,4 @@
 /my-application/values:
   - value 1
   - value 2
+/other-application/key: secret-value

@@ -4,3 +4,4 @@ foo: bar
 values:
   - value 1
   - value 2
+password: secret-value
