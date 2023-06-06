@@ -49,6 +49,7 @@ Consumers:
       config:
         baz: qux
         foo: bar
+        qux_quux: corgie
 
 
 Daemon: {}

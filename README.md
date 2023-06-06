@@ -119,9 +119,10 @@ In addition to the base functionality exposed by Jinja2, the following Python fu
 
 The following filters are added:
 
-| Filter   | Description                         |
-|----------|-------------------------------------|
-| `toyaml` | Converts a dictionary value to YAML |
+| Filter                  | Description                                                                                                  |
+|-------------------------|--------------------------------------------------------------------------------------------------------------|
+| `dashes_to_underscores` | Recursively replaces dashes with underscores in keys in data structures returned by `get_parameters_by_path` |
+| `toyaml`                | Converts a dictionary value to YAML                                                                          |
 
 The following variables are exposed:
 

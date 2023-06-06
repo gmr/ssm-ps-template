@@ -16,3 +16,4 @@ parameters_by_path:
   settings/:
     foo: bar
     baz: qux
+    qux-quux: corgie

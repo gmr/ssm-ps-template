@@ -24,3 +24,40 @@ class DiscoveryTestCase(unittest.TestCase):
         expectation = path.read_text('utf-8')
 
         self.assertEqual(result.strip(), expectation.strip())
+
+
+class DashesToUnderscoresTestCase(unittest.TestCase):
+
+    def test_replace_dashes_with_underscores(self):
+        value = {
+            'foo-bar': 'baz',
+            'qux': {
+                'quux-corgie': 'grault'
+            },
+            'quux-corgie': [
+                {'grault-garply': 'waldo'},
+                {'fred-plugh': 'xyzzy'}
+            ],
+            'grault': [
+                'garply', 'waldo'
+            ]
+        }
+        expectation = {
+            'foo_bar': 'baz',
+            'qux': {
+                'quux_corgie': 'grault'
+            },
+            'quux_corgie': [
+                {'grault_garply': 'waldo'},
+                {'fred_plugh': 'xyzzy'},
+            ],
+            'grault': [
+                'garply', 'waldo'
+            ]
+        }
+        self.assertDictEqual(
+            render.replace_dashes_with_underscores(value), expectation)
+
+    def test_raises_on_bad_data_type(self):
+        with self.assertRaises(TypeError):
+            render.replace_dashes_with_underscores('foo')
