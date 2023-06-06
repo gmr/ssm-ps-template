@@ -47,6 +47,9 @@ Consumers:
       queue: foo-queue
       error_exchange: error-exchange
       config:
+        abc:
+          def: 123
+          ghi: 456
         baz: qux
         foo: bar
         qux_quux: corgie

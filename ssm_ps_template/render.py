@@ -4,12 +4,20 @@ import pathlib
 import typing
 from urllib import parse
 
+import flatdict
+
+import flatdict
 import yaml
 from jinja2 import sandbox
 
 from ssm_ps_template import ssm
 
 LOGGER = logging.getLogger(__name__)
+
+
+def path_to_dict(value: dict) -> dict:
+    flat = flatdict.FlatDict(value, delimiter='/')
+    return flat.as_dict()
 
 
 def replace_dashes_with_underscores(value_in: typing.Union[dict, list]) \
@@ -48,6 +56,7 @@ class Renderer:
         environment = sandbox.ImmutableSandboxedEnvironment()
         environment.filters['dashes_to_underscores'] = \
             replace_dashes_with_underscores
+        environment.filters['path_to_dict'] = path_to_dict
         environment.filters['toyaml'] = lambda v: yaml.safe_dump(v)
         environment.globals['get_parameter'] = self._get_parameter
         environment.globals['get_parameters_by_path'] = \

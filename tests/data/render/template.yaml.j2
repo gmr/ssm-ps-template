@@ -46,7 +46,7 @@ Application:
       error_exchange: {{ get_parameter('error_exchange') }}{% endif %}{%- if get_parameter('error_max_retry') is not none %}
       error_max_retry: {{ get_parameter('error_max_retry') }}{% endif %}{% if get_parameters_by_path('settings/') %}
       config:
-{{ get_parameters_by_path('settings/') | dashes_to_underscores | toyaml | indent(8, first=True) }}{% endif %}
+{{ get_parameters_by_path('settings/') | path_to_dict | dashes_to_underscores | toyaml | indent(8, first=True) }}{% endif %}
 
 Daemon: {}
 

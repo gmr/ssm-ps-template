@@ -17,3 +17,5 @@ parameters_by_path:
     foo: bar
     baz: qux
     qux-quux: corgie
+    abc/def: 123
+    abc/ghi: 456

@@ -49,9 +49,9 @@ The following example will iterate over the results:
 {% endfor %}
 ```
 
-Or you can use a Jinja filter to convert them to YAML:
+Or you can use Jinja filters to convert them to YAML:
 ```yaml
-{{ get_parameters_by_path('settings/') | toyaml | indent(2, first=True) }}
+{{ get_parameters_by_path('settings/') | path_to_dict | toyaml | indent(2, first=True) }}
 ```
 
 For values in ParameterStore that are stored as `StringList`, they are automatically transformed as a list of strings. Given the following value:
@@ -122,6 +122,7 @@ The following filters are added:
 | Filter                  | Description                                                                                                  |
 |-------------------------|--------------------------------------------------------------------------------------------------------------|
 | `dashes_to_underscores` | Recursively replaces dashes with underscores in keys in data structures returned by `get_parameters_by_path` |
+| `path_to_dict`          | Converts a dict with forward-slash delimited keys (`/`) to a nested dict using the `/` as the key delimiter  |
 | `toyaml`                | Converts a dictionary value to YAML                                                                          |
 
 The following variables are exposed:

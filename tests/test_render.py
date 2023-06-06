@@ -22,7 +22,6 @@ class DiscoveryTestCase(unittest.TestCase):
 
         path = utils.TEST_DATA_PATH / 'render/expectation.yaml'
         expectation = path.read_text('utf-8')
-
         self.assertEqual(result.strip(), expectation.strip())
 
 
@@ -61,3 +60,21 @@ class DashesToUnderscoresTestCase(unittest.TestCase):
     def test_raises_on_bad_data_type(self):
         with self.assertRaises(TypeError):
             render.replace_dashes_with_underscores('foo')
+
+
+class PathToDictTestCase(unittest.TestCase):
+
+    def test_path_to_dict(self):
+        value = {
+            'foo/bar/baz': 'qux',
+            'foo/bar/qux': 'quux'
+        }
+        expectation = {
+            'foo': {
+                'bar': {
+                    'baz': 'qux',
+                    'qux': 'quux'
+                }
+            }
+        }
+        self.assertDictEqual(render.path_to_dict(value), expectation)
