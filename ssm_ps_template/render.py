@@ -5,8 +5,6 @@ import typing
 from urllib import parse
 
 import flatdict
-
-import flatdict
 import yaml
 from jinja2 import sandbox
 
