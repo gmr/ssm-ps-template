@@ -93,3 +93,9 @@ Logging:
     handlers: [console]
   disable_existing_loggers: true
   incremental: false
+
+foo: bar
+baz: qux
+
+foo2: bar
+baz2: qux

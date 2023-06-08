@@ -122,6 +122,8 @@ The following filters are added:
 | Filter                  | Description                                                                                                  |
 |-------------------------|--------------------------------------------------------------------------------------------------------------|
 | `dashes_to_underscores` | Recursively replaces dashes with underscores in keys in data structures returned by `get_parameters_by_path` |
+| `fromjson`              | Convert a JSON blob to a data structure                                                                      |
+| `fromyaml`              | Convert a YAML blob to a data structure                                                                      |
 | `path_to_dict`          | Converts a dict with forward-slash delimited keys (`/`) to a nested dict using the `/` as the key delimiter  |
 | `toyaml`                | Converts a dictionary value to YAML                                                                          |
 

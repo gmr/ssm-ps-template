@@ -10,6 +10,9 @@ parameters:
   qty: 1
   queue: foo-queue
   statsd/enabled: false
+  json_blob: "{\"foo\": \"bar\", \"baz\": \"qux\"}"
+  yaml_blob: '{"foo2": "bar", "baz2": "qux"}'
+
 parameters_by_path:
   loggers/:
     boto3: INFO

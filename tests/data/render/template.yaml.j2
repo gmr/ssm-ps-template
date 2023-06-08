@@ -87,3 +87,12 @@ Logging:
     handlers: [console]
   disable_existing_loggers: true
   incremental: false
+
+{% set json = get_parameter("json_blob") | fromjson -%}
+{%- for key, value in json.items() -%}
+{{ key }}: {{ value }}
+{% endfor %}
+{% set yaml = get_parameter("yaml_blob") | fromyaml -%}
+{%- for key, value in yaml.items() -%}
+{{ key }}: {{ value }}
+{% endfor %}

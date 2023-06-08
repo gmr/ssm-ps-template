@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import pathlib
@@ -54,6 +55,8 @@ class Renderer:
         environment = sandbox.ImmutableSandboxedEnvironment()
         environment.filters['dashes_to_underscores'] = \
             replace_dashes_with_underscores
+        environment.filters['fromjson'] = lambda v: json.loads(v)
+        environment.filters['fromyaml'] = lambda v: yaml.safe_load(v)
         environment.filters['path_to_dict'] = path_to_dict
         environment.filters['toyaml'] = lambda v: yaml.safe_dump(v)
         environment.globals['get_parameter'] = self._get_parameter
