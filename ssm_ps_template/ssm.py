@@ -61,13 +61,14 @@ class ParameterStore:
             values.parameters_by_path[key] = {}
 
         LOGGER.debug('Fetching Parameters By Path %r', names)
+        paginator = self._client.get_paginator('get_parameters_by_path')
         for name in names:
-            response = self._client.get_parameters_by_path(
-                Path=name, Recursive=True, WithDecryption=True)
-            for param in response['Parameters']:
-                key = param['Name'][len(name):]
-                values.parameters_by_path[name_map[name]][key] = \
-                    self._parameter_value(param)
+            for page in paginator.paginate(
+                    Path=name, Recursive=True, WithDecryption=True):
+                for param in page['Parameters']:
+                    key = param['Name'][len(name):]
+                    values.parameters_by_path[name_map[name]][key] = \
+                        self._parameter_value(param)
 
         return values
 
