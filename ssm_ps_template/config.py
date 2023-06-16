@@ -13,6 +13,9 @@ class Template:
     source: pathlib.Path
     destination: pathlib.Path
     prefix: typing.Optional[str]
+    user: typing.Union[int, str, None]
+    group: typing.Union[int, str, None]
+    mode: typing.Optional[str]
 
 
 @dataclasses.dataclass
@@ -29,10 +32,15 @@ def _load_configuration(value: dict) -> Configuration:
     templates = []
     try:
         for template in value['templates'] or []:
+            mode = int(template.get('mode'), 8) \
+                if template.get('mode') else None
             templates.append(_entry_to_template(
                 source=template['source'],
                 destination=template['destination'],
-                prefix=template.get('prefix')))
+                prefix=template.get('prefix'),
+                user=template.get('user'),
+                group=template.get('group'),
+                mode=mode))
     except KeyError as error:
         raise argparse.ArgumentTypeError(
             f'Failed to load configuration due to invalid key: {error}')
@@ -52,7 +60,10 @@ def _entry_to_template(**kwargs) -> Template:
             f'Specified template {source} does not exist')
     return Template(source=source,
                     destination=pathlib.Path(kwargs['destination']),
-                    prefix=kwargs['prefix'])
+                    prefix=kwargs['prefix'],
+                    user=kwargs['user'],
+                    group=kwargs['group'],
+                    mode=kwargs['mode'])
 
 
 def configuration_file(value: str) -> Configuration:

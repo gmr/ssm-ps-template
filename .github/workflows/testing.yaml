@@ -28,9 +28,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
 
-      - name: Display available groups for the user
-        run: groups
-
       - name: Install testing dependencies
         run: pip3 install -e '.[dev]'
 

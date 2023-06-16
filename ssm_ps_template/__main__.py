@@ -1,6 +1,8 @@
 import argparse
+import grp
 import logging
 import os
+import pwd
 import sys
 import time
 import typing
@@ -10,6 +12,19 @@ from ssm_ps_template import config, discovery, render, ssm
 
 LOGGER = logging.getLogger(__name__)
 LOGGING_FORMAT = '%(message)s'
+
+
+def chown(path: str,
+          user: typing.Union[int, str, None],
+          group: typing.Union[int, str, None]) -> typing.NoReturn:
+    kwargs = {'path': path}
+    if user is not None and not str(user).isnumeric():
+        user = pwd.getpwnam(str(user)).pw_uid
+    kwargs['uid'] = int(user) if user else os.getuid()
+    if group is not None and not str(group).isnumeric():
+        group = grp.getgrnam(str(group)).gr_gid
+    kwargs['gid'] = int(group) if group else os.getgid()
+    os.chown(**kwargs)
 
 
 def parse_cli_arguments(args: typing.Optional[typing.List[str]] = None) \
@@ -64,9 +79,17 @@ def render_templates(args: argparse.Namespace) -> typing.NoReturn:
             LOGGER.error('Error fetching parameters: %s', err)
             sys.exit(1)
 
+        if not template.destination.parent.exists():
+            template.destination.parent.mkdir(parents=True, exist_ok=True)
+
         renderer = render.Renderer(source=template.source)
-        with template.destination.open('w') as handle:
-            handle.write(renderer.render(values))
+        template.destination.write_text(renderer.render(values))
+
+        if template.user or template.group:
+            chown(str(template.destination), template.user, template.group)
+
+        if template.mode:
+            template.destination.chmod(template.mode)
 
         LOGGER.info('Rendered %s in %0.2f seconds', template.destination,
                     time.time() - start_time)

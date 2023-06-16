@@ -1,3 +1,8 @@
 [[templates]]
 source = "tests/data/main/test.yaml.j2"
-destination = "build/main-test.yaml"
+destination = "build/test/main-test.yaml"
+mode = "600"
+
+[[templates]]
+source = "tests/data/main/test.yaml.j2"
+destination = "build/test/main-test2.yaml"

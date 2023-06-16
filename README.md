@@ -108,6 +108,8 @@ The `templates` directive in the configuration is an array of objects:
 | `group`       | An optional group or gid to set as the group of the rendered file                    |
 | `mode`        | Optional file mode and permissions set using chmod                                   |
 
+If there are parent directories in the `destination` path that do not exist, they will be created.
+
 ### Extended Templating Functionality
 
 In addition to the base functionality exposed by Jinja2, the following Python functions have been added:
