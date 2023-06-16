@@ -152,6 +152,9 @@ templates:
   - source: /etc/ssm-templates/postgres-example
     destination: /etc/postgresql/14/main/postgresql.conf
     prefix: /namespaced/application/postgres/
+    user: postgres
+    group: postgres
+    mode: 0600
 profile: default
 region: us-east-1
 verbose: false
