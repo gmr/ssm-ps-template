@@ -28,6 +28,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
 
+      - name: Display available groups for the user
+        run: groups
+
       - name: Install testing dependencies
         run: pip3 install -e '.[dev]'
 
@@ -41,6 +44,7 @@ jobs:
           AWS_ACCESS_KEY_ID: local
           AWS_SECRET_ACCESS_KEY: development
           SSM_ENDPOINT_URL: http://localstack:4566
+
       - name: Upload Coverage
         uses: codecov/codecov-action@v1.0.2
         if: github.event_name == 'push' && github.repository == 'gmr/ssm-ps-template'

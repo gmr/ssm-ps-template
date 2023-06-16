@@ -97,13 +97,16 @@ The configuration file provides the ability to specify multiple templates, overr
 
 ### Template Configuration Directives
 
-The `templates` directive in the configuration is an array of objects, defined by a `source` and `destination`.
+The `templates` directive in the configuration is an array of objects:
 
 | Directive     | Description                                                                          |
 |---------------|--------------------------------------------------------------------------------------|
 | `source`      | The source file of the template                                                      |
 | `destination` | The destination path to write the rendered template to                               |
 | `prefix`      | The prefix to prepend variables with if they do not start with a forward-slash (`/`) |
+| `user`        | An optional username or uid to set as the owner of the rendered file                 |
+| `group`       | An optional group or gid to set as the group of the rendered file                    |
+| `mode`        | Optional file mode and permissions set using chmod                                   |
 
 ### Extended Templating Functionality
 
