@@ -31,10 +31,12 @@ The application exposes `get_parameter(name: str, default: typing.Optional[str] 
 In the following example we assume there are Parameter Store values for the keys `/my-application/foo` and `/my-application/bar` and that the application is called with a prefix of `/my-appliction`:
 
 ```yaml
-foo: {{ get_parameter('/my-application/foo'}}
-bar: {{ get_parameter('/my-application/bar'}}
+foo: {{ get_parameter('/my-application/foo') }}
+bar: {{ get_parameter('/my-application/bar') }}
 ```
+
 Will render as:
+
 ```yaml
 foo: bar
 baz: qux
@@ -43,6 +45,7 @@ baz: qux
 Additionally, there is another function exposed `get_parameters_by_path(path: str, default: typing.Optional[dict] = None)` which will return a dictionary for the specified path.
 
 The following example will iterate over the results:
+
 ```yaml
 {% for key, value in get_parameters_by_path('settings/', {}).items() %}
   {{ key }}: {{ value }}
@@ -50,6 +53,7 @@ The following example will iterate over the results:
 ```
 
 Or you can use Jinja filters to convert them to YAML:
+
 ```yaml
 {{ get_parameters_by_path('settings/') | path_to_dict | toyaml | indent(2, first=True) }}
 ```
@@ -162,7 +166,7 @@ verbose: false
 
 ## Command Line Usage
 
-```
+```sh
 usage: ssm-ps-template [-h] [--aws-profile AWS_PROFILE] [--aws-region AWS_REGION] [--endpoint-url ENDPOINT_URL] [--prefix PREFIX] [--replace-underscores]
                        [--verbose] [--version]
                        config
@@ -186,5 +190,6 @@ optional arguments:
   --verbose
   --version             show program's version number and exit
 ```
+
 Note that the default SSM prefix can also be set with the `PARAMS_PREFIX` environment variable and
 the endpoint URL setting cn be set with the `SSM_ENDPOINT_URL` environment variable.
