@@ -14,6 +14,38 @@ from ssm_ps_template import ssm
 LOGGER = logging.getLogger(__name__)
 
 
+def coerce_type(value_in: str) -> typing.Union[bool, int, None, str]:
+    if value_in.lower() in ['true', 'false']:
+        return True if value_in.lower() == 'true' else False
+    elif value_in.lower() in ['~', 'null']:
+        return None
+    elif value_in.isnumeric() and not '.' in value_in:
+        return int(value_in)
+    return value_in
+
+
+def coerce(value_in: typing.Union[dict, list]) -> typing.Union[dict, list]:
+    if isinstance(value_in, dict):
+        output = {}
+        for key, value in value_in.items():
+            new_key = key.replace('-', '_')
+            if isinstance(value, (dict, list)):
+                output[new_key] = coerce(value)
+            else:
+                output[new_key] = coerce_type(value)
+        return output
+    elif isinstance(value_in, list):
+        output = []
+        for value in value_in:
+            if isinstance(value, (dict, list)):
+                output.append(coerce(value))
+            else:
+                output.append(coerce_type(value))
+        return output
+    else:
+        raise TypeError('Method invoked with incorrect data type')
+
+
 def path_to_dict(value: dict) -> dict:
     flat = flatdict.FlatDict(value, delimiter='/')
     return flat.as_dict()
@@ -53,6 +85,7 @@ class Renderer:
         """Render the template to the internal buffer"""
         self._values = values
         environment = sandbox.ImmutableSandboxedEnvironment()
+        environment.filters['coerce_types'] = coerce
         environment.filters['dashes_to_underscores'] = \
             replace_dashes_with_underscores
         environment.filters['fromjson'] = lambda v: json.loads(v)

@@ -78,3 +78,33 @@ class PathToDictTestCase(unittest.TestCase):
             }
         }
         self.assertDictEqual(render.path_to_dict(value), expectation)
+
+
+class CoerceTestCase(unittest.TestCase):
+
+    def test_dict_coercion(self):
+        value = {
+            'foo': {
+                'bool_true': 'true',
+                'bool_false': 'false',
+                'float': '10.0',
+                'int': '1',
+                'null_tilde': '~',
+                'null_word': 'NULL',
+                'str': 'value'
+            },
+            'bar': ['true', 'false', '10.0', '2', '~', 'null', 'value']
+        }
+        expectation = {
+            'foo': {
+                'bool_true': True,
+                'bool_false': False,
+                'float': '10.0',
+                'int': 1,
+                'null_tilde': None,
+                'null_word': None,
+                'str': 'value'
+            },
+            'bar': [True, False, '10.0', 2, None, None, 'value']
+        }
+        self.assertDictEqual(render.coerce(value), expectation)

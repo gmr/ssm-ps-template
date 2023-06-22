@@ -4,4 +4,9 @@ foo: bar
 values:
   - value 1
   - value 2
+  - True
+  - False
+  - None
+  - 1
+  - 10.0
 password: secret-value

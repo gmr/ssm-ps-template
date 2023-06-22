@@ -1,7 +1,7 @@
 ---
 baz: {{ get_parameter('baz') }}
 foo: {{ get_parameter('foo') }}
-values:{% for value in get_parameter('values', []) %}
+values:{% for value in get_parameter('values', []) | coerce_types %}
   - {{ value }}
 {%- endfor %}
 password: {{ get_parameter('/other-application/key') }}
