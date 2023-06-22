@@ -19,7 +19,7 @@ def coerce_type(value_in: str) -> typing.Union[bool, int, None, str]:
         return True if value_in.lower() == 'true' else False
     elif value_in.lower() in ['~', 'null']:
         return None
-    elif value_in.isnumeric() and not '.' in value_in:
+    elif value_in.isnumeric() and '.' not in value_in:
         return int(value_in)
     return value_in
 
