@@ -1,6 +1,6 @@
 [project]
 name = "ssm-ps-template"
-version = "2.5.0"
+version = "2.5.1"
 description = "CLI for rendering configuration templates with SSM Parameter Store as a data source"
 authors = [
     {name = "Gavin M. Roy", email="gavinmroy@gmail.com"}
@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "boto3>=1,<2",
-    "flatdict>=4,<5",
+    "flatdict>=4.1,<5",
     "jinja2>=3,<4",
     "pyyaml>=5.3.1,<7",
     "toml>=0.10,<1"
