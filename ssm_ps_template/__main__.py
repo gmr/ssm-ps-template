@@ -5,7 +5,6 @@ import os
 import pwd
 import sys
 import time
-import typing
 from importlib import metadata
 
 from ssm_ps_template import config, discovery, render, ssm
@@ -18,7 +17,7 @@ def chown(
     path: str,
     user: int | str | None,
     group: int | str | None,
-) -> typing.NoReturn:
+) -> None:
     kwargs = {'path': path}
     if user is not None and not str(user).isnumeric():
         user = pwd.getpwnam(str(user)).pw_uid
@@ -80,7 +79,7 @@ def parse_cli_arguments(
     return parser.parse_args(args)
 
 
-def render_templates(args: argparse.Namespace) -> typing.NoReturn:
+def render_templates(args: argparse.Namespace) -> None:
     parameter_store = ssm.ParameterStore(
         profile=args.aws_profile or args.config[0].profile,
         region=args.aws_region or args.config[0].region,

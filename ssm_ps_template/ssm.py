@@ -11,8 +11,8 @@ LOGGER = logging.getLogger(__name__)
 
 @dataclasses.dataclass
 class Values:
-    parameters: dict[str, str]
-    parameters_by_path: dict[str, dict[str, str]]
+    parameters: dict[str, str | list[str]]
+    parameters_by_path: dict[str, dict[str, str | list[str]]]
 
 
 class ParameterStore:

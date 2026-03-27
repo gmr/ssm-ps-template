@@ -14,7 +14,7 @@ class Template:
     prefix: str | None
     user: int | str | None
     group: int | str | None
-    mode: str | None
+    mode: int | None
 
 
 @dataclasses.dataclass

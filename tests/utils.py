@@ -1,7 +1,6 @@
 import os
 import pathlib
 import sys
-import typing
 import unittest
 
 import boto3
@@ -10,7 +9,7 @@ TEST_PATH = pathlib.Path(__file__).parent
 TEST_DATA_PATH = TEST_PATH / 'data'
 
 
-def load_test_env() -> typing.NoReturn:
+def load_test_env() -> None:
     path = TEST_PATH / '../build/test.env'
     if not path.exists():
         sys.stderr.write('Failed to find test.env.file\n')
@@ -26,7 +25,7 @@ def load_test_env() -> typing.NoReturn:
 
 
 class ParameterStoreTestCase(unittest.TestCase):
-    def setUp(self) -> typing.NoReturn:
+    def setUp(self) -> None:
         super().setUp()
         load_test_env()
         self.client = boto3.client(
@@ -34,11 +33,11 @@ class ParameterStoreTestCase(unittest.TestCase):
         )
         self.ssm_keys = set()
 
-    def tearDown(self) -> typing.NoReturn:
+    def tearDown(self) -> None:
         self.prune_parameters()
         super().tearDown()
 
-    def prune_parameters(self) -> typing.NoReturn:
+    def prune_parameters(self) -> None:
         if self.ssm_keys:
             client = boto3.client(
                 'ssm', endpoint_url=os.environ['SSM_ENDPOINT_URL']
@@ -47,7 +46,7 @@ class ParameterStoreTestCase(unittest.TestCase):
 
     def put_parameter(
         self, key: str, value: str | list[str]
-    ) -> typing.NoReturn:
+    ) -> None:
         self.ssm_keys.add(key)
         if isinstance(value, list):
             self.client.put_parameter(
@@ -56,6 +55,6 @@ class ParameterStoreTestCase(unittest.TestCase):
         else:
             self.client.put_parameter(Name=key, Value=value, Type='String')
 
-    def put_parameters(self, values: dict) -> typing.NoReturn:
+    def put_parameters(self, values: dict) -> None:
         for key, value in values.items():
             self.put_parameter(key, value)
