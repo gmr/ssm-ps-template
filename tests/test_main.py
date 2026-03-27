@@ -70,6 +70,7 @@ class MainTestCase(utils.ParameterStoreTestCase):
     def test_chown_group(self):
         gids = os.getgroups()
         path = pathlib.Path('build/test-chown-group')
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text('test-data')
 
         __main__.chown(str(path), None, gids[0])
@@ -82,6 +83,7 @@ class MainTestCase(utils.ParameterStoreTestCase):
         # This is a noop but will test the code branch
         uid = os.getuid()
         path = pathlib.Path('build/test-chown-user')
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text('test-data')
 
         __main__.chown(str(path), uid, None)
