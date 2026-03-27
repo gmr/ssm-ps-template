@@ -44,9 +44,7 @@ class ParameterStoreTestCase(unittest.TestCase):
             )
             client.delete_parameters(Names=list(self.ssm_keys))
 
-    def put_parameter(
-        self, key: str, value: str | list[str]
-    ) -> None:
+    def put_parameter(self, key: str, value: str | list[str]) -> None:
         self.ssm_keys.add(key)
         if isinstance(value, list):
             self.client.put_parameter(
