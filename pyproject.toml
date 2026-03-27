@@ -1,65 +1,69 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "ssm-ps-template"
 version = "2.5.1"
 description = "CLI for rendering configuration templates with SSM Parameter Store as a data source"
 authors = [
-    {name = "Gavin M. Roy", email="gavinmroy@gmail.com"}
+    { name = "Gavin M. Roy", email = "gavinmroy@gmail.com" },
 ]
 classifiers = [
-    "Topic :: Software Development",
-    "License :: OSI Approved :: BSD License",
-    "Programming Language :: Python :: 3",
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: BSD License",
     "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Software Development",
     "Topic :: Text Processing",
-    "Topic :: Utilities"
+    "Topic :: Utilities",
 ]
 dependencies = [
     "boto3>=1,<2",
     "flatdict>=4.1,<5",
     "jinja2>=3,<4",
     "pyyaml>=5.3.1,<7",
-    "toml>=0.10,<1"
+    "toml>=0.10,<1",
 ]
 keywords = ["aws", "ssm", "parameter store", "templating"]
-license = {file = "LICENSE.txt"}
+license = "BSD-3-Clause"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 
 [project.scripts]
 ssm-ps-template = "ssm_ps_template.__main__:main"
 
 [project.urls]
-"Homepage" = "https://github.com/gmr/ssm-ps-template"
+Homepage = "https://github.com/gmr/ssm-ps-template"
 "Bug Tracker" = "https://github.com/gmr/ssm-ps-template/issues"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "build",
-    "coverage",
-    "flake8",
-    "flake8-comprehensions",
-    "flake8-deprecated",
-    "flake8-import-order",
-    "flake8-print",
-    "flake8-pyproject",
-    "flake8-quotes",
-    "flake8-rst-docstrings",
-    "flake8-tuple"
+    "coverage[toml]",
+    "pre-commit",
+    "pytest",
+    "ruff",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.coverage.run]
 branch = true
-command_line = "-m unittest discover tests --verbose"
-data_file = "build/.coverage"
+source = ["ssm_ps_template"]
+command_line = "-m pytest"
 
 [tool.coverage.report]
 show_missing = true
-include = ["ssm_ps_template/*"]
-omit = ["tests/*.py"]
 
 [tool.coverage.html]
 directory = "build/coverage"
@@ -67,9 +71,46 @@ directory = "build/coverage"
 [tool.coverage.xml]
 output = "build/coverage.xml"
 
-[tool.flake8]
-application-import-names = ["ssm_ps_template", "tests"]
-count = true
-exclude = ["bak", "build", "docs", "env"]
-import-order-style = "pycharm"
-ignore = ["RST306"]
+[tool.ruff]
+line-length = 79
+target-version = "py311"
+exclude = []
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint]
+select = [
+    "BLE",      # flake8-blind-except
+    "C4",       # flake8-comprehensions
+    "C90",      # mccabe
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "G",        # flake8-logging-format
+    "I",        # isort
+    "N",        # pep8-naming
+    "Q",        # flake8-quotes
+    "S",        # flake8-bandit
+    "ASYNC",    # flake8-async
+    "B",        # flake8-bugbear
+    "DTZ",      # flake8-datetimez
+    "FURB",     # refurb
+    "RUF",      # ruff-specific
+    "T20",      # flake8-print
+    "UP",       # pyupgrade
+]
+ignore = [
+    "N818",     # SSMClientException is existing public API
+    "RSE",      # contradicts Python Style Guide
+    "S311",     # Not doing cryptography
+]
+flake8-quotes = { inline-quotes = "single" }
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ssm_ps_template"]

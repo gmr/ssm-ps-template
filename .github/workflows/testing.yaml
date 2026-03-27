@@ -1,5 +1,6 @@
 name: Testing
 on:
+  pull_request:
   push:
     branches: ["*"]
     paths-ignore:
@@ -7,45 +8,49 @@ on:
       - '*.md'
       - '*.rst'
     tags-ignore: ["*"]
+
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python:
-          - "3.9"
-          - "3.10"
-          - "3.11"
-    container:
-      image: python:${{ matrix.python }}-alpine
+        python: ["3.11", "3.12", "3.13", "3.14"]
+
     services:
       localstack:
         image: localstack/localstack
         ports:
           - 4566:4566
           - 4510-4559:4510-4559
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
-      - name: Install testing dependencies
-        run: pip3 install -e '.[dev]'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: '${{ matrix.python }}'
 
-      - name: Run flake8 tests
-        run: flake8 --output build/flake8.txt --tee
+      - name: Lint Check
+        run: uv run pre-commit run --all-files
 
       - name: Run tests
-        run: coverage run && coverage report && coverage xml
+        run: |
+          uv run coverage run
+          uv run coverage report
+          uv run coverage xml
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: local
           AWS_SECRET_ACCESS_KEY: development
-          SSM_ENDPOINT_URL: http://localstack:4566
+          SSM_ENDPOINT_URL: http://localhost:4566
 
       - name: Upload Coverage
-        uses: codecov/codecov-action@v1.0.2
-        if: github.event_name == 'push' && github.repository == 'gmr/ssm-ps-template'
+        uses: codecov/codecov-action@v5
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
-          file: build/coverage.xml
+          files: ./build/coverage.xml
           flags: unittests
