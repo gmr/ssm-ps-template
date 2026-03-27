@@ -7,17 +7,18 @@ from tests import utils
 
 
 class DiscoveryTestCase(unittest.TestCase):
-
     def test_render(self):
         with (utils.TEST_DATA_PATH / 'render/values.yaml').open() as handle:
             data = yaml.safe_load(handle)
 
         values = ssm.Values(
             parameters=data['parameters'],
-            parameters_by_path=data['parameters_by_path'])
+            parameters_by_path=data['parameters_by_path'],
+        )
 
         renderer = render.Renderer(
-            utils.TEST_DATA_PATH / 'render/template.yaml.j2')
+            utils.TEST_DATA_PATH / 'render/template.yaml.j2'
+        )
         result = renderer.render(values)
 
         path = utils.TEST_DATA_PATH / 'render/expectation.yaml'
@@ -26,36 +27,28 @@ class DiscoveryTestCase(unittest.TestCase):
 
 
 class DashesToUnderscoresTestCase(unittest.TestCase):
-
     def test_replace_dashes_with_underscores(self):
         value = {
             'foo-bar': 'baz',
-            'qux': {
-                'quux-corgie': 'grault'
-            },
+            'qux': {'quux-corgie': 'grault'},
             'quux-corgie': [
                 {'grault-garply': 'waldo'},
-                {'fred-plugh': 'xyzzy'}
+                {'fred-plugh': 'xyzzy'},
             ],
-            'grault': [
-                'garply', 'waldo'
-            ]
+            'grault': ['garply', 'waldo'],
         }
         expectation = {
             'foo_bar': 'baz',
-            'qux': {
-                'quux_corgie': 'grault'
-            },
+            'qux': {'quux_corgie': 'grault'},
             'quux_corgie': [
                 {'grault_garply': 'waldo'},
                 {'fred_plugh': 'xyzzy'},
             ],
-            'grault': [
-                'garply', 'waldo'
-            ]
+            'grault': ['garply', 'waldo'],
         }
         self.assertDictEqual(
-            render.replace_dashes_with_underscores(value), expectation)
+            render.replace_dashes_with_underscores(value), expectation
+        )
 
     def test_raises_on_bad_data_type(self):
         with self.assertRaises(TypeError):
@@ -63,25 +56,13 @@ class DashesToUnderscoresTestCase(unittest.TestCase):
 
 
 class PathToDictTestCase(unittest.TestCase):
-
     def test_path_to_dict(self):
-        value = {
-            'foo/bar/baz': 'qux',
-            'foo/bar/qux': 'quux'
-        }
-        expectation = {
-            'foo': {
-                'bar': {
-                    'baz': 'qux',
-                    'qux': 'quux'
-                }
-            }
-        }
+        value = {'foo/bar/baz': 'qux', 'foo/bar/qux': 'quux'}
+        expectation = {'foo': {'bar': {'baz': 'qux', 'qux': 'quux'}}}
         self.assertDictEqual(render.path_to_dict(value), expectation)
 
 
 class CoerceTestCase(unittest.TestCase):
-
     def test_dict_coercion(self):
         value = {
             'foo': {
@@ -91,9 +72,9 @@ class CoerceTestCase(unittest.TestCase):
                 'int': '1',
                 'null_tilde': '~',
                 'null_word': 'NULL',
-                'str': 'value'
+                'str': 'value',
             },
-            'bar': ['true', 'false', '10.0', '2', '~', 'null', 'value']
+            'bar': ['true', 'false', '10.0', '2', '~', 'null', 'value'],
         }
         expectation = {
             'foo': {
@@ -103,8 +84,8 @@ class CoerceTestCase(unittest.TestCase):
                 'int': 1,
                 'null_tilde': None,
                 'null_word': None,
-                'str': 'value'
+                'str': 'value',
             },
-            'bar': [True, False, '10.0', 2, None, None, 'value']
+            'bar': [True, False, '10.0', 2, None, None, 'value'],
         }
         self.assertDictEqual(render.coerce(value), expectation)

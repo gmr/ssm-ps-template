@@ -1,22 +1,37 @@
-name: Deployment
+name: Publish to PyPI
+
 on:
-  push:
-    branches-ignore: ["*"]
-    tags: ["*"]
+  release:
+    types: [published]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') && github.repository == 'gmr/ssm-ps-template'
-    container: python:3.11-alpine
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ssm-ps-template
+
+    permissions:
+      id-token: write
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v1
-      - name: Install wheel
-        run: pip3 install build wheel
-      - name: Build package
-        run: python3 -m build
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: actions/checkout@v5
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build wheel twine
+
+      - name: Build and check package
+        run: |
+          python -m build
+          twine check dist/*
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

@@ -37,7 +37,7 @@ class VariableDiscovery:
         """Discover the variables that to look up in SSM Parameter Store"""
         variable_type, state = None, State.OFF
         variables = Variables(set(), set())
-        for (line_no, ident, value) in self.tokens():
+        for _line_no, ident, value in self.tokens():
             if state == State.OFF and ident == 'name' and value in FUNCTIONS:
                 state = State.BLOCK_PENDING
                 variable_type = value
@@ -50,8 +50,9 @@ class VariableDiscovery:
                 state, variable_type = State.OFF, None
         return variables
 
-    def tokens(self) \
-            -> typing.Generator[typing.Tuple[int, str, str], None, None]:
+    def tokens(
+        self,
+    ) -> typing.Generator[tuple[int, str, str], None, None]:
         while self._offset < len(self._tokens):
             yield self._tokens[self._offset]
             self._offset += 1

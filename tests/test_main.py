@@ -20,7 +20,6 @@ def delete_folder(path):
 
 
 class MainTestCase(utils.ParameterStoreTestCase):
-
     def test_render_templates(self):
         output_dir = pathlib.Path('./build/test').resolve()
         delete_folder(output_dir)
@@ -28,9 +27,13 @@ class MainTestCase(utils.ParameterStoreTestCase):
         with (utils.TEST_DATA_PATH / 'main/data.yaml').open('r') as handle:
             self.put_parameters(yaml.safe_load(handle))
 
-        args = __main__.parse_cli_arguments([
-            '--prefix', '/my-application',
-            str(utils.TEST_DATA_PATH / 'main/config.toml')])
+        args = __main__.parse_cli_arguments(
+            [
+                '--prefix',
+                '/my-application',
+                str(utils.TEST_DATA_PATH / 'main/config.toml'),
+            ]
+        )
 
         __main__.render_templates(args)
 
@@ -41,18 +44,24 @@ class MainTestCase(utils.ParameterStoreTestCase):
 
         self.assertEqual(
             result_path.read_text('utf-8').strip(),
-            expectation.read_text('utf-8').strip())
+            expectation.read_text('utf-8').strip(),
+        )
 
         # Run a second time for branch coverage
         __main__.render_templates(args)
 
     def test_ssm_error_exits(self):
-        args = __main__.parse_cli_arguments([
-            '--prefix', '/my-application',
-            str(utils.TEST_DATA_PATH / 'main/config.toml')])
+        args = __main__.parse_cli_arguments(
+            [
+                '--prefix',
+                '/my-application',
+                str(utils.TEST_DATA_PATH / 'main/config.toml'),
+            ]
+        )
 
         with mock.patch(
-                'ssm_ps_template.ssm.ParameterStore.fetch_variables') as func:
+            'ssm_ps_template.ssm.ParameterStore.fetch_variables'
+        ) as func:
             func.side_effect = ssm.SSMClientException('Mock Error')
             with self.assertRaises(SystemExit) as system_exit:
                 __main__.render_templates(args)
@@ -61,6 +70,7 @@ class MainTestCase(utils.ParameterStoreTestCase):
     def test_chown_group(self):
         gids = os.getgroups()
         path = pathlib.Path('build/test-chown-group')
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text('test-data')
 
         __main__.chown(str(path), None, gids[0])
@@ -73,6 +83,7 @@ class MainTestCase(utils.ParameterStoreTestCase):
         # This is a noop but will test the code branch
         uid = os.getuid()
         path = pathlib.Path('build/test-chown-user')
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text('test-data')
 
         __main__.chown(str(path), uid, None)
